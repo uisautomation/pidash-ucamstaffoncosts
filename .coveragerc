@@ -1,0 +1,9 @@
+[run]
+omit=
+	setup.py
+	manage.py
+	*/test/*
+	*/tests/*
+	smswebapp/settings/*
+	smswebapp/wsgi.py
+	.tox/*
