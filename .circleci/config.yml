@@ -1,0 +1,82 @@
+version: 2
+
+jobs:
+  test:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+
+      - run:
+          name: Install and activate venv
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install tox codecov
+
+      - run:
+          name: Run tests
+          command: |
+            . venv/bin/activate
+            tox
+
+      - run:
+          name: Submit code coverage information
+          command: |
+            . venv/bin/activate
+            codecov
+
+      - store_artifacts:
+          path: build/htmlcov
+          destination: htmlcov
+
+      - store_artifacts:
+          path: build/doc
+          destination: doc
+
+      - store_test_results:
+          path: build/test-results
+
+      - persist_to_workspace:
+          root: build
+          paths:
+            - doc
+
+  deploy_docs:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+
+      - checkout
+
+      - run:
+          name: Install and activate venv
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install ghp-import
+
+      - run:
+          name: Import GH pages
+          command: |
+            . venv/bin/activate
+            ghp-import /tmp/workspace/doc
+            git config --local user.email "automation@uis.cam.ac.uk"
+            git config --local user.name "Deployment robot"
+            git push -f https://${GITHUB_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} gh-pages:gh-pages
+
+workflows:
+  version: 2
+
+  test_and_deploy:
+    jobs:
+      - test
+      - deploy_docs:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
