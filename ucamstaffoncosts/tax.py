@@ -44,7 +44,6 @@ def _make_nic_calculator(boundaries):
 TABLE_A_EMPLOYER_NIC = {
     2018: _make_nic_calculator((
         (6032, 0),
-
         (8424, 0),
         (46350, fractions.Fraction(138, 1000)),
         (None, fractions.Fraction(138, 1000)),
