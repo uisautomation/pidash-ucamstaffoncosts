@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ucamstaffoncosts &mdash; University of Cambridge Staff On-costs  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> University of Cambridge Staff On-costs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">University of Cambridge Staff On-costs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>ucamstaffoncosts</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ucamstaffoncosts</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">fractions</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">tax</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">pension</span>
+
+<span class="n">_OnCost</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;OnCost&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;salary exchange employer_pension employer_nic apprenticeship_levy total&#39;</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="OnCost"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.OnCost">[docs]</a><span class="k">class</span> <span class="nc">OnCost</span><span class="p">(</span><span class="n">_OnCost</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An individual on-costs calculation for a gross salary.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        These values are all rounded to the nearest pound and so total may not be the sum of all</span>
+<span class="sd">        the other fields.</span>
+
+<span class="sd">    .. py:attribute:: salary</span>
+
+<span class="sd">        Gross salary for the employee.</span>
+
+<span class="sd">    .. py:attribute:: exchange</span>
+
+<span class="sd">        Amount of gross salary exchanged as part of a salary exchange pension. By convention, this</span>
+<span class="sd">        value is negative if non-zero.</span>
+
+<span class="sd">    .. py:attribute:: employer_pension</span>
+
+<span class="sd">        Employer pension contribution including any salary exchange amount.</span>
+
+<span class="sd">    .. py:attribute:: employer_nic</span>
+
+<span class="sd">        Employer National Insurance contribution</span>
+
+<span class="sd">    .. py:attribute:: apprenticeship_levy</span>
+
+<span class="sd">        Share of Apprenticeship Levy from this employee</span>
+
+<span class="sd">    .. py:attribute:: total</span>
+
+<span class="sd">        Total on-cost of employing this employee. See note above about situations where this value</span>
+<span class="sd">        may not be the sum of the others.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Scheme"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.Scheme">[docs]</a><span class="k">class</span> <span class="nc">Scheme</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Possible pension schemes an employee can be a member of.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: No pension scheme.</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
+
+    <span class="c1">#: CPS hybrid</span>
+    <span class="n">CPS_HYBRID</span> <span class="o">=</span> <span class="s1">&#39;cps_hybrid&#39;</span>
+
+    <span class="c1">#: CPS hybrid with salary exchange</span>
+    <span class="n">CPS_HYBRID_EXCHANGE</span> <span class="o">=</span> <span class="s1">&#39;cps_hybrid_exchange&#39;</span>
+
+    <span class="c1">#: USS</span>
+    <span class="n">USS</span> <span class="o">=</span> <span class="s1">&#39;uss&#39;</span>
+
+    <span class="c1">#: USS with salary exchange</span>
+    <span class="n">USS_EXCHANGE</span> <span class="o">=</span> <span class="s1">&#39;uss_exchange&#39;</span>
+
+    <span class="c1">#: NHS</span>
+    <span class="n">NHS</span> <span class="o">=</span> <span class="s1">&#39;nhs&#39;</span></div>
+
+
+<span class="c1">#: Special value to pass to :py:func:`~.on_cost` to represent the latest tax year which has an</span>
+<span class="c1">#: implementation.</span>
+<span class="n">LATEST</span> <span class="o">=</span> <span class="s1">&#39;LATEST&#39;</span>
+
+
+<div class="viewcode-block" id="on_cost"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.on_cost">[docs]</a><span class="k">def</span> <span class="nf">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">LATEST</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a :py:class:`OnCost` instance given a tax year, pension scheme and gross salary.</span>
+
+<span class="sd">    :param int year: tax year</span>
+<span class="sd">    :param Scheme scheme: pension scheme</span>
+<span class="sd">    :param int gross_salary: gross salary of employee</span>
+
+<span class="sd">    :raises NotImplementedError: if there is not an implementation for the specified tax year and</span>
+<span class="sd">        pension scheme.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">year</span> <span class="o">=</span> <span class="n">_LATEST_TAX_YEAR</span> <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="n">LATEST</span> <span class="k">else</span> <span class="n">year</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">calculator</span> <span class="o">=</span> <span class="n">_ON_COST_CALCULATORS</span><span class="p">[</span><span class="n">year</span><span class="p">][</span><span class="n">scheme</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">calculator</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_on_cost_calculator</span><span class="p">(</span><span class="n">employer_nic_cb</span><span class="p">,</span>
+                        <span class="n">employer_pension_cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="n">exchange_cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                        <span class="n">apprenticeship_levy_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">standard_apprenticeship_levy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a callable which will calculate an OnCost entry from a gross salary. Arguments which are</span>
+<span class="sd">    callables each take a single argument which is a :py:class:`fractions.Fraction` instance</span>
+<span class="sd">    representing the gross salary of the employee. They should return a</span>
+<span class="sd">    :py:class:`fractions.Fraction` instance.</span>
+
+<span class="sd">    :param employer_pension_cb: callable which gives employer pension contribution from gross</span>
+<span class="sd">        salary.</span>
+<span class="sd">    :param employer_nic_cb: callable which gives employer National Insurance contribution from</span>
+<span class="sd">        gross salary.</span>
+<span class="sd">    :param exchange_cb: callable which gives amount of salary sacrificed in a salary exchange</span>
+<span class="sd">        scheme from gross salary.</span>
+<span class="sd">    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from gross</span>
+<span class="sd">        salary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">):</span>
+        <span class="c1"># Ensure gross salary is a rational</span>
+        <span class="n">gross_salary</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
+
+        <span class="c1"># We use the convention that the salary exchange value is negative to match the exchange</span>
+        <span class="c1"># column in HR tables.</span>
+        <span class="n">exchange</span> <span class="o">=</span> <span class="o">-</span><span class="n">exchange_cb</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
+
+        <span class="c1"># The employer pension contribution is the contribution based on gross salary along with</span>
+        <span class="c1"># the employee contribution sacrificed from their salary.</span>
+        <span class="n">employer_pension</span> <span class="o">=</span> <span class="n">employer_pension_cb</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span> <span class="o">-</span> <span class="n">exchange</span>
+
+        <span class="c1"># the taxable salary is the gross less the amount sacrificed. HR would appear to round the</span>
+        <span class="c1"># sacrifice first</span>
+        <span class="n">taxable_salary</span> <span class="o">=</span> <span class="n">gross_salary</span> <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">exchange</span><span class="p">)</span>
+
+        <span class="c1"># The employer&#39;s NIC is calculated on the taxable salary.</span>
+        <span class="n">employer_nic</span> <span class="o">=</span> <span class="n">employer_nic_cb</span><span class="p">(</span><span class="n">taxable_salary</span><span class="p">)</span>
+
+        <span class="c1"># The Apprenticeship Levy is calculated on the taxable salary.</span>
+        <span class="n">apprenticeship_levy</span> <span class="o">=</span> <span class="n">apprenticeship_levy_cb</span><span class="p">(</span><span class="n">taxable_salary</span><span class="p">)</span>
+
+        <span class="c1"># The total is calculated using the rounded values.</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_excel_round</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">exchange</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_pension</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_nic</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">apprenticeship_levy</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Round all of the values. Note the odd rounding for exchange. This matters since the</span>
+        <span class="c1"># tables HR generate seem to include -_excel_round(-exchange) even though the total column</span>
+        <span class="c1"># is calculated using _excel_round(exchange). Since Excel always rounds halves up, this</span>
+        <span class="c1"># means that _excel_round(exchange) does not, in general, equal -_excel_round(-exchange) as</span>
+        <span class="c1"># you might expect. Caveat programmer!</span>
+
+        <span class="k">return</span> <span class="n">OnCost</span><span class="p">(</span>
+            <span class="n">salary</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">),</span>
+            <span class="n">exchange</span><span class="o">=-</span><span class="n">_excel_round</span><span class="p">(</span><span class="o">-</span><span class="n">exchange</span><span class="p">),</span>
+            <span class="n">employer_pension</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_pension</span><span class="p">),</span>
+            <span class="n">employer_nic</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_nic</span><span class="p">),</span>
+            <span class="n">apprenticeship_levy</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">apprenticeship_levy</span><span class="p">),</span>
+            <span class="n">total</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">total</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">on_cost</span>
+
+
+<span class="k">def</span> <span class="nf">_excel_round</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A version of round() which applies the Excel rule that halves rounds *up* rather than the</span>
+<span class="sd">    conventional wisdom that they round to the nearest even.</span>
+
+<span class="sd">    (The jury is out about whether Excel really rounds away from zero or up but rounding up matches</span>
+<span class="sd">    the tables produced by HR.)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure input is a rational</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># always round up halves</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+
+<span class="c1">#: On cost calculators keyed initially by year and then by scheme identifier.</span>
+<span class="n">_ON_COST_CALCULATORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">2018</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># An employee with no scheme in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee with USS in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employer_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee with USS and salary exchange in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">USS_EXCHANGE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employer_contribution</span><span class="p">,</span>
+            <span class="n">exchange_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employee_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee with CPS in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">CPS_HYBRID</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employer_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee with CPS and salary exchange in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">CPS_HYBRID_EXCHANGE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employer_contribution</span><span class="p">,</span>
+            <span class="n">exchange_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employee_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee on the NHS scheme in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">NHS</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">nhs_employer_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">_LATEST_TAX_YEAR</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_ON_COST_CALCULATORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, UIS Automation Team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

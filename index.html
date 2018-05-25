@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>University of Cambridge Staff On-costs Calculator &mdash; University of Cambridge Staff On-costs  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> University of Cambridge Staff On-costs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">University of Cambridge Staff On-costs Calculator</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#module-ucamstaffoncosts">Reference</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">University of Cambridge Staff On-costs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>University of Cambridge Staff On-costs Calculator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="university-of-cambridge-staff-on-costs-calculator">
+<h1>University of Cambridge Staff On-costs Calculator<a class="headerlink" href="#university-of-cambridge-staff-on-costs-calculator" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ucamstaffoncosts</span></code> module calculates total on-costs associated with
+employing staff members in the University of Cambridge. The total on-costs value
+calculated by this module reflects the expenditure which will result from
+employing a staff member on a grant.</p>
+<p>The aim is to replicate the <a class="reference external" href="https://www.hr.admin.cam.ac.uk/Salaries/242">information</a> available on the University HR’s
+website using only the publicly available rates.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Installation is best done via pip:</p>
+<div class="code console highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install git+https://github.com/uisautomation/pidash-ucamstaffoncosts
+</pre></div>
+</div>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>The functionality of the module is exposed through a single function,
+<a class="reference internal" href="#ucamstaffoncosts.on_cost" title="ucamstaffoncosts.on_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">on_cost()</span></code></a>, which takes a tax year, pension scheme and
+gross salary and returns an <a class="reference internal" href="#ucamstaffoncosts.OnCost" title="ucamstaffoncosts.OnCost"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnCost</span></code></a> object
+representing the on-costs for that employee:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ucamstaffoncosts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="o">=</span><span class="mi">25000</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">scheme</span><span class="o">=</span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="mi">2018</span><span class="p">)</span>
+<span class="go">OnCost(salary=25000, exchange=0, employer_pension=4500,</span>
+<span class="go">       employer_nic=2287, apprenticeship_levy=125, total=31912)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#ucamstaffoncosts.OnCost.total" title="ucamstaffoncosts.OnCost.total"><code class="xref py py-attr docutils literal notranslate"><span class="pre">total</span></code></a> attribute from the return value
+can be used to forecast total expenditure for an employee in a given tax year.</p>
+<p>If <em>year</em> is omitted, then the latest tax year which has any calculators
+implemented is used. This behaviour can also be signalled by using the special
+value <a class="reference internal" href="#ucamstaffoncosts.LATEST" title="ucamstaffoncosts.LATEST"><code class="xref py py-const docutils literal notranslate"><span class="pre">LATEST</span></code></a>:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">ucamstaffoncosts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="o">=</span><span class="mi">25000</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">scheme</span><span class="o">=</span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">year</span><span class="o">=</span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">LATEST</span><span class="p">)</span>
+<span class="go">OnCost(salary=25000, exchange=0, employer_pension=4500,</span>
+<span class="go">       employer_nic=2287, apprenticeship_levy=125, total=31912)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="o">=</span><span class="mi">25000</span><span class="p">,</span>
+<span class="gp">... </span>                         <span class="n">scheme</span><span class="o">=</span><span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">)</span>
+<span class="go">OnCost(salary=25000, exchange=0, employer_pension=4500,</span>
+<span class="go">       employer_nic=2287, apprenticeship_levy=125, total=31912)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-ucamstaffoncosts">
+<span id="reference"></span><h2>Reference<a class="headerlink" href="#module-ucamstaffoncosts" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="ucamstaffoncosts.LATEST">
+<code class="descclassname">ucamstaffoncosts.</code><code class="descname">LATEST</code><em class="property"> = 'LATEST'</em><a class="headerlink" href="#ucamstaffoncosts.LATEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special value to pass to <a class="reference internal" href="#ucamstaffoncosts.on_cost" title="ucamstaffoncosts.on_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">on_cost()</span></code></a> to represent the latest tax year which has an
+implementation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ucamstaffoncosts.OnCost">
+<em class="property">class </em><code class="descclassname">ucamstaffoncosts.</code><code class="descname">OnCost</code><a class="reference internal" href="_modules/ucamstaffoncosts.html#OnCost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ucamstaffoncosts.OnCost" title="Permalink to this definition">¶</a></dt>
+<dd><p>An individual on-costs calculation for a gross salary.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">These values are all rounded to the nearest pound and so total may not be the sum of all
+the other fields.</p>
+</div>
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.salary">
+<code class="descname">salary</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.salary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gross salary for the employee.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.exchange">
+<code class="descname">exchange</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.exchange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Amount of gross salary exchanged as part of a salary exchange pension. By convention, this
+value is negative if non-zero.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.employer_pension">
+<code class="descname">employer_pension</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.employer_pension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Employer pension contribution including any salary exchange amount.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.employer_nic">
+<code class="descname">employer_nic</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.employer_nic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Employer National Insurance contribution</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.apprenticeship_levy">
+<code class="descname">apprenticeship_levy</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.apprenticeship_levy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Share of Apprenticeship Levy from this employee</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.OnCost.total">
+<code class="descname">total</code><a class="headerlink" href="#ucamstaffoncosts.OnCost.total" title="Permalink to this definition">¶</a></dt>
+<dd><p>Total on-cost of employing this employee. See note above about situations where this value
+may not be the sum of the others.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ucamstaffoncosts.Scheme">
+<em class="property">class </em><code class="descclassname">ucamstaffoncosts.</code><code class="descname">Scheme</code><a class="reference internal" href="_modules/ucamstaffoncosts.html#Scheme"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ucamstaffoncosts.Scheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Possible pension schemes an employee can be a member of.</p>
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.CPS_HYBRID">
+<code class="descname">CPS_HYBRID</code><em class="property"> = 'cps_hybrid'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.CPS_HYBRID" title="Permalink to this definition">¶</a></dt>
+<dd><p>CPS hybrid</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.CPS_HYBRID_EXCHANGE">
+<code class="descname">CPS_HYBRID_EXCHANGE</code><em class="property"> = 'cps_hybrid_exchange'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.CPS_HYBRID_EXCHANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>CPS hybrid with salary exchange</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.NHS">
+<code class="descname">NHS</code><em class="property"> = 'nhs'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.NHS" title="Permalink to this definition">¶</a></dt>
+<dd><p>NHS</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.NONE">
+<code class="descname">NONE</code><em class="property"> = 'none'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.NONE" title="Permalink to this definition">¶</a></dt>
+<dd><p>No pension scheme.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.USS">
+<code class="descname">USS</code><em class="property"> = 'uss'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.USS" title="Permalink to this definition">¶</a></dt>
+<dd><p>USS</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Scheme.USS_EXCHANGE">
+<code class="descname">USS_EXCHANGE</code><em class="property"> = 'uss_exchange'</em><a class="headerlink" href="#ucamstaffoncosts.Scheme.USS_EXCHANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>USS with salary exchange</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ucamstaffoncosts.on_cost">
+<code class="descclassname">ucamstaffoncosts.</code><code class="descname">on_cost</code><span class="sig-paren">(</span><em>gross_salary</em>, <em>scheme</em>, <em>year='LATEST'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ucamstaffoncosts.html#on_cost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ucamstaffoncosts.on_cost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="#ucamstaffoncosts.OnCost" title="ucamstaffoncosts.OnCost"><code class="xref py py-class docutils literal notranslate"><span class="pre">OnCost</span></code></a> instance given a tax year, pension scheme and gross salary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>year</strong> (<em>int</em>) – tax year</li>
+<li><strong>scheme</strong> (<a class="reference internal" href="#ucamstaffoncosts.Scheme" title="ucamstaffoncosts.Scheme"><em>Scheme</em></a>) – pension scheme</li>
+<li><strong>gross_salary</strong> (<em>int</em>) – gross salary of employee</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>NotImplementedError</strong> – if there is not an implementation for the specified tax year and
+pension scheme.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, UIS Automation Team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
