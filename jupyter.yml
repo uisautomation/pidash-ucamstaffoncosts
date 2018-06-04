@@ -1,0 +1,25 @@
+# Docker compose file to launch jupyter notebook with module installed
+version: '3.2'
+
+services:
+  notebook:
+    image: jupyter/scipy-notebook
+    command: ["sh", "-c", "pip install ~/repo && start-notebook.sh"]
+    expose:
+      - "8888"
+    ports:
+      - "8888:8888"
+    volumes:
+      - "work:/home/jovyan/work"
+      - type: bind
+        source: ./
+        target: /home/jovyan/repo
+        read_only: true
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      CHOWN_EXTRA: "/home/jovyan/work"
+      CHOWN_EXTRA_OPTS: "-R"
+
+volumes:
+  # Persistent workspace for Jupyter
+  work:
