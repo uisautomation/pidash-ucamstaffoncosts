@@ -28,6 +28,12 @@ OnCost(salary=25000, exchange=0, employer_pension=4500,
        employer_nic=2287, apprenticeship_levy=125, total=31912)
 ```
 
+## Future development
+
+This module will be extended to support full expenditure/commitment calculation.
+The method we propose to use is documented in [a JupyterLab
+notebook](doc/salary-calculations.ipynb).
+
 ## Configuring CircleCI
 
 The CircleCI workflow includes automatically building and pushing documentation
@@ -35,3 +41,18 @@ to GitHub pages whenever there is a commit to the master branch. In order to
 enable this, a personal access token for a robot user must be generated and
 added to the CircleCI configuration as the ``GITHUB_TOKEN`` environment
 variable.
+
+## Running JupyterLab
+
+A [docker-compose configuration](jupyter.yml) for running
+[JupyterLab](http://jupyterlab.readthedocs.io/en/stable/index.html) is included.
+Start the server using the ``docker-compose`` command:
+
+```bash
+$ docker-compose -f jupyter.yml up
+```
+
+Follow the http://localhost:8888/ link printed to the console. This repository
+is mounted read-only at ``~/repo/`` and a persistent volume is mounted to the
+workspace at ``~/work``. The ``ucamstaffoncosts`` module is pre-installed into
+the JupyterLab environment.
