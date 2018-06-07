@@ -1,0 +1,231 @@
+grades:
+- name: T_GRADE
+  scale:
+  - {isContribution: false, name: T11, point: POINT_11}
+  - {isContribution: false, name: T12, point: POINT_12}
+  - {isContribution: false, name: T13, point: POINT_13}
+- name: GRADE_1
+  scale:
+  - {isContribution: false, name: '1', point: POINT_14}
+  - {isContribution: false, name: '2', point: POINT_15}
+  - {isContribution: false, name: '3', point: POINT_16}
+  - {isContribution: false, name: '4', point: POINT_17}
+  - {isContribution: false, name: '5', point: POINT_18}
+  - {isContribution: true, name: '6', point: POINT_19}
+  - {isContribution: true, name: '7', point: POINT_20}
+  - {isContribution: true, name: '8', point: POINT_21}
+- name: GRADE_2
+  scale:
+  - {isContribution: false, name: '1', point: POINT_19}
+  - {isContribution: false, name: '2', point: POINT_20}
+  - {isContribution: false, name: '3', point: POINT_21}
+  - {isContribution: false, name: '4', point: POINT_22}
+  - {isContribution: false, name: '5', point: POINT_23}
+  - {isContribution: false, name: '6', point: POINT_24}
+  - {isContribution: true, name: '7', point: POINT_25}
+  - {isContribution: true, name: '8', point: POINT_26}
+  - {isContribution: true, name: '9', point: POINT_27}
+  - {isContribution: true, name: '10', point: POINT_28}
+- name: GRADE_3
+  scale:
+  - {isContribution: false, name: '1', point: POINT_24}
+  - {isContribution: false, name: '2', point: POINT_25}
+  - {isContribution: false, name: '3', point: POINT_26}
+  - {isContribution: false, name: '4', point: POINT_27}
+  - {isContribution: false, name: '5', point: POINT_28}
+  - {isContribution: false, name: '6', point: POINT_29}
+  - {isContribution: true, name: '7', point: POINT_30}
+  - {isContribution: true, name: '8', point: POINT_31}
+  - {isContribution: true, name: '9', point: POINT_32}
+  - {isContribution: true, name: '10', point: POINT_33}
+  - {isContribution: false, name: null, point: POINT_72}
+- name: GRADE_4
+  scale:
+  - {isContribution: false, name: '1', point: POINT_29}
+  - {isContribution: false, name: '2', point: POINT_30}
+  - {isContribution: false, name: '3', point: POINT_31}
+  - {isContribution: false, name: '4', point: POINT_32}
+  - {isContribution: false, name: '5', point: POINT_33}
+  - {isContribution: false, name: '6', point: POINT_34}
+  - {isContribution: true, name: '7', point: POINT_35}
+  - {isContribution: true, name: '8', point: POINT_36}
+  - {isContribution: true, name: '9', point: POINT_37}
+  - {isContribution: true, name: '10', point: POINT_38}
+- name: GRADE_5
+  scale:
+  - {isContribution: false, name: '1', point: POINT_34}
+  - {isContribution: false, name: '2', point: POINT_35}
+  - {isContribution: false, name: '3', point: POINT_36}
+  - {isContribution: false, name: '4', point: POINT_37}
+  - {isContribution: false, name: '5', point: POINT_38}
+  - {isContribution: false, name: '6', point: POINT_39}
+  - {isContribution: true, name: '7', point: POINT_40}
+  - {isContribution: true, name: '8', point: POINT_41}
+  - {isContribution: true, name: '9', point: POINT_42}
+  - {isContribution: true, name: '10', point: POINT_43}
+  - {isContribution: true, name: '11', point: POINT_44}
+- name: GRADE_6
+  scale:
+  - {isContribution: false, name: '1', point: POINT_37}
+  - {isContribution: false, name: '2', point: POINT_38}
+  - {isContribution: false, name: '3', point: POINT_39}
+  - {isContribution: false, name: '4', point: POINT_40}
+  - {isContribution: false, name: '5', point: POINT_41}
+  - {isContribution: false, name: '6', point: POINT_42}
+  - {isContribution: false, name: '7', point: POINT_43}
+  - {isContribution: true, name: '8', point: POINT_44}
+  - {isContribution: true, name: '9', point: POINT_45}
+  - {isContribution: true, name: '10', point: POINT_46}
+  - {isContribution: true, name: '11', point: POINT_47}
+  - {isContribution: true, name: '12', point: POINT_48}
+- name: GRADE_7
+  scale:
+  - {isContribution: false, name: '1', point: POINT_39}
+  - {isContribution: false, name: '2', point: POINT_40}
+  - {isContribution: false, name: '3', point: POINT_41}
+  - {isContribution: false, name: '4', point: POINT_42}
+  - {isContribution: false, name: '5', point: POINT_43}
+  - {isContribution: false, name: '6', point: POINT_44}
+  - {isContribution: false, name: '7', point: POINT_45}
+  - {isContribution: false, name: '8', point: POINT_46}
+  - {isContribution: false, name: '9', point: POINT_47}
+  - {isContribution: false, name: '10', point: POINT_48}
+  - {isContribution: true, name: '11', point: POINT_49}
+  - {isContribution: true, name: '12', point: POINT_50}
+  - {isContribution: true, name: '13', point: POINT_51}
+  - {isContribution: true, name: '14', point: POINT_52}
+- name: GRADE_8
+  scale:
+  - {isContribution: false, name: '1', point: POINT_45}
+  - {isContribution: false, name: '2', point: POINT_46}
+  - {isContribution: false, name: '3', point: POINT_47}
+  - {isContribution: false, name: '4', point: POINT_48}
+  - {isContribution: false, name: '5', point: POINT_49}
+  - {isContribution: false, name: '6', point: POINT_50}
+  - {isContribution: false, name: '7', point: POINT_51}
+  - {isContribution: false, name: '8', point: POINT_52}
+  - {isContribution: false, name: '9', point: POINT_53}
+  - {isContribution: false, name: '10', point: POINT_54}
+  - {isContribution: false, name: '11', point: POINT_55}
+  - {isContribution: true, name: '12', point: POINT_56}
+  - {isContribution: true, name: '13', point: POINT_57}
+  - {isContribution: true, name: '14', point: POINT_58}
+- name: GRADE_9
+  scale:
+  - {isContribution: false, name: '1', point: POINT_49}
+  - {isContribution: false, name: '2', point: POINT_50}
+  - {isContribution: false, name: '3', point: POINT_51}
+  - {isContribution: false, name: '4', point: POINT_52}
+  - {isContribution: false, name: '5', point: POINT_53}
+  - {isContribution: false, name: '6', point: POINT_54}
+  - {isContribution: false, name: '7', point: POINT_55}
+  - {isContribution: false, name: '8', point: POINT_56}
+  - {isContribution: false, name: '9', point: POINT_57}
+  - {isContribution: true, name: '10', point: POINT_58}
+  - {isContribution: true, name: '11', point: POINT_59}
+  - {isContribution: true, name: '12', point: POINT_60}
+  - {isContribution: true, name: '13', point: POINT_61}
+- name: GRADE_10
+  scale:
+  - {isContribution: false, name: '1', point: POINT_59}
+  - {isContribution: false, name: '2', point: POINT_60}
+  - {isContribution: false, name: '3', point: POINT_61}
+  - {isContribution: true, name: '4', point: POINT_62}
+  - {isContribution: true, name: '5', point: POINT_63}
+  - {isContribution: true, name: '6', point: POINT_64}
+- name: GRADE_11
+  scale:
+  - {isContribution: true, name: '1', point: POINT_62}
+  - {isContribution: true, name: '2', point: POINT_63}
+  - {isContribution: true, name: '3', point: POINT_64}
+  - {isContribution: true, name: '4', point: POINT_65}
+  - {isContribution: true, name: '5', point: POINT_66}
+  - {isContribution: true, name: '6', point: POINT_67}
+- name: GRADE_12_BAND_1
+  scale:
+  - {isContribution: true, name: null, point: POINT_68}
+  - {isContribution: true, name: null, point: POINT_69}
+  - {isContribution: true, name: null, point: POINT_70}
+  - {isContribution: true, name: null, point: POINT_71}
+  - {isContribution: true, name: null, point: POINT_72}
+  - {isContribution: true, name: null, point: POINT_73}
+  - {isContribution: true, name: null, point: POINT_74}
+  - {isContribution: true, name: null, point: POINT_75}
+  - {isContribution: true, name: null, point: POINT_76}
+- name: GRADE_12_BAND_2
+  scale:
+  - {isContribution: true, name: null, point: POINT_75}
+  - {isContribution: true, name: null, point: POINT_76}
+  - {isContribution: true, name: null, point: POINT_77}
+  - {isContribution: true, name: null, point: POINT_78}
+  - {isContribution: true, name: null, point: POINT_79}
+  - {isContribution: true, name: null, point: POINT_80}
+  - {isContribution: true, name: null, point: POINT_81}
+  - {isContribution: true, name: null, point: POINT_82}
+- name: GRADE_12_BAND_3
+  scale:
+  - {isContribution: true, name: null, point: POINT_81}
+  - {isContribution: true, name: null, point: POINT_82}
+  - {isContribution: true, name: null, point: POINT_83}
+  - {isContribution: true, name: null, point: POINT_84}
+  - {isContribution: true, name: null, point: POINT_85}
+  - {isContribution: true, name: null, point: POINT_86}
+  - {isContribution: true, name: null, point: POINT_87}
+  - {isContribution: true, name: null, point: POINT_88}
+- name: GRADE_12_BAND_4
+  scale:
+  - {isContribution: true, name: null, point: POINT_87}
+  - {isContribution: true, name: null, point: POINT_88}
+  - {isContribution: true, name: null, point: POINT_89}
+  - {isContribution: true, name: null, point: POINT_90}
+  - {isContribution: true, name: null, point: POINT_91}
+  - {isContribution: true, name: null, point: POINT_92}
+  - {isContribution: true, name: null, point: POINT_93}
+  - {isContribution: true, name: null, point: POINT_94}
+  - {isContribution: true, name: null, point: POINT_95}
+  - {isContribution: true, name: null, point: POINT_96}
+  - {isContribution: true, name: null, point: POINT_97}
+  - {isContribution: true, name: null, point: POINT_98}
+  - {isContribution: true, name: null, point: POINT_99}
+  - {isContribution: true, name: null, point: POINT_100}
+salaries:
+- effectiveDate: 2016-08-01
+  mapping: {POINT_100: 177005, POINT_11: 13965, POINT_12: 14327, POINT_13: 14767,
+    POINT_14: 15052, POINT_15: 15356, POINT_16: 15670, POINT_17: 15976, POINT_18: 16289,
+    POINT_19: 16618, POINT_20: 16961, POINT_21: 17399, POINT_22: 17898, POINT_23: 18412,
+    POINT_24: 18940, POINT_25: 19485, POINT_26: 20046, POINT_27: 20624, POINT_28: 21220,
+    POINT_29: 21843, POINT_30: 22494, POINT_31: 23164, POINT_32: 23879, POINT_33: 24565,
+    POINT_34: 25298, POINT_35: 26052, POINT_36: 26829, POINT_37: 27629, POINT_38: 28452,
+    POINT_39: 29301, POINT_40: 30175, POINT_41: 31076, POINT_42: 32004, POINT_43: 32958,
+    POINT_44: 33943, POINT_45: 34956, POINT_46: 36001, POINT_47: 37075, POINT_48: 38183,
+    POINT_49: 39324, POINT_50: 40523, POINT_51: 41709, POINT_52: 42955, POINT_53: 44240,
+    POINT_54: 45562, POINT_55: 46924, POINT_56: 48327, POINT_57: 49772, POINT_58: 51260,
+    POINT_59: 52793, POINT_60: 54372, POINT_61: 55998, POINT_62: 57674, POINT_63: 59400,
+    POINT_64: 61178, POINT_65: 63009, POINT_66: 64894, POINT_67: 66835, POINT_68: 68834,
+    POINT_69: 70893, POINT_70: 73015, POINT_71: 75202, POINT_72: 77456, POINT_73: 79773,
+    POINT_74: 82161, POINT_75: 84622, POINT_76: 87156, POINT_77: 89767, POINT_78: 92453,
+    POINT_79: 95223, POINT_80: 98074, POINT_81: 101012, POINT_82: 104038, POINT_83: 107155,
+    POINT_84: 110364, POINT_85: 113671, POINT_86: 117074, POINT_87: 120584, POINT_88: 124196,
+    POINT_89: 127917, POINT_90: 131749, POINT_91: 135697, POINT_92: 139763, POINT_93: 143950,
+    POINT_94: 148263, POINT_95: 152708, POINT_96: 157282, POINT_97: 161998, POINT_98: 166852,
+    POINT_99: 171855}
+- effectiveDate: 2017-08-01
+  mapping: {POINT_100: 180014, POINT_11: 14304, POINT_12: 14675, POINT_13: 15126,
+    POINT_14: 15417, POINT_15: 15721, POINT_16: 16035, POINT_17: 16341, POINT_18: 16654,
+    POINT_19: 16983, POINT_20: 17326, POINT_21: 17764, POINT_22: 18263, POINT_23: 18777,
+    POINT_24: 19305, POINT_25: 19850, POINT_26: 20411, POINT_27: 20989, POINT_28: 21585,
+    POINT_29: 22214, POINT_30: 22876, POINT_31: 23557, POINT_32: 24285, POINT_33: 24983,
+    POINT_34: 25728, POINT_35: 26495, POINT_36: 27285, POINT_37: 28098, POINT_38: 28936,
+    POINT_39: 29799, POINT_40: 30688, POINT_41: 31604, POINT_42: 32548, POINT_43: 33518,
+    POINT_44: 34520, POINT_45: 35550, POINT_46: 36613, POINT_47: 37706, POINT_48: 38833,
+    POINT_49: 39992, POINT_50: 41212, POINT_51: 42418, POINT_52: 43685, POINT_53: 44992,
+    POINT_54: 46336, POINT_55: 47722, POINT_56: 49149, POINT_57: 50618, POINT_58: 52132,
+    POINT_59: 53691, POINT_60: 55297, POINT_61: 56950, POINT_62: 58655, POINT_63: 60410,
+    POINT_64: 62218, POINT_65: 64080, POINT_66: 65997, POINT_67: 67971, POINT_68: 70004,
+    POINT_69: 72099, POINT_70: 74257, POINT_71: 76481, POINT_72: 78772, POINT_73: 81129,
+    POINT_74: 83558, POINT_75: 86060, POINT_76: 88638, POINT_77: 91293, POINT_78: 94025,
+    POINT_79: 96842, POINT_80: 99741, POINT_81: 102729, POINT_82: 105807, POINT_83: 108977,
+    POINT_84: 112240, POINT_85: 115603, POINT_86: 119064, POINT_87: 122634, POINT_88: 126308,
+    POINT_89: 130091, POINT_90: 133989, POINT_91: 138004, POINT_92: 142139, POINT_93: 146397,
+    POINT_94: 150784, POINT_95: 155304, POINT_96: 159956, POINT_97: 164752, POINT_98: 169689,
+    POINT_99: 174776}

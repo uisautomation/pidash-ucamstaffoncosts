@@ -1,232 +1,164 @@
+"""
+.. testsetup::
+
+    from ucamstaffoncosts import *
+    import datetime
+
+"""
 import collections
-import enum
+import datetime
 import fractions
-import math
 
-from . import tax
-from . import pension
+from . import costs
 
-_OnCost = collections.namedtuple(
-    'OnCost',
-    'salary exchange employer_pension employer_nic apprenticeship_levy total'
-)
+from .costs import Scheme, Cost
+from .salary.progression import SalaryRecord
+from .salary.scales import Grade
 
 
-class OnCost(_OnCost):
-    """An individual on-costs calculation for a base salary.
+__all__ = ['calculate_commitment', 'CommitmentExplanation', 'Scheme', 'Grade', 'Cost',
+           'SalaryRecord']
 
-    .. note::
 
-        These values are all rounded to the nearest pound and so total may not be the sum of all
-        the other fields.
+def calculate_commitment(until_date, initial_grade, initial_point, scheme,
+                         from_date=None, tax_year_start_month=4, tax_year_start_day=6,
+                         **kwargs):
+    """
+    Calculate the commitment remaining for an employee's contract. Returns a pair giving the total
+    commitment and a list of :py:class:`CommitmentExplanation` tuples explaining the calculation.
+
+    Remaining keyword arguments are passed to :py:func:`costs_by_tax_year`.
+
+    >>> from ucamstaffoncosts import Grade, Scheme
+    >>> from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES
+    >>> initial_grade = Grade.GRADE_2
+    >>> initial_point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(initial_grade)
+    >>> scheme = Scheme.USS_EXCHANGE
+    >>> next_anniversary_date = datetime.date(2016, 6, 1)
+    >>> from_date = next_anniversary_date - datetime.timedelta(days=400)
+    >>> until_date = datetime.datetime.now().date() + datetime.timedelta(days=1000)
+
+    >>> total, _ = calculate_commitment(
+    ...     until_date, initial_grade, initial_point, scheme,
+    ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
+    ...     scale_table=EXAMPLE_SALARY_SCALES)
+    >>> total
+    113127
+
+    Note that the first tax year will contain the *from_date*:
+
+    >>> from_date = datetime.date(2016, 1, 1)
+    >>> _, explanations = calculate_commitment(
+    ...     until_date, initial_grade, initial_point, scheme,
+    ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
+    ...     scale_table=EXAMPLE_SALARY_SCALES)
+    >>> explanations[0].tax_year
+    2015
+
+    """
+    from_date = from_date if from_date is not None else datetime.datetime.now().date()
+
+    # Start from tax year containing from_date
+    from_year = from_date.year
+    if datetime.date(from_year, tax_year_start_month, tax_year_start_day) > from_date:
+        from_year -= 1
+
+    # Calculate costs
+    all_costs = costs.costs_by_tax_year(
+        from_year, initial_grade, initial_point, scheme,
+        tax_year_start_month=tax_year_start_month,
+        tax_year_start_day=tax_year_start_day,
+        until_date=until_date, **kwargs)
+
+    explanations = []
+
+    total_commitment = 0
+    for year, cost, salaries in all_costs:
+        # What range of dates does this cover?
+        start_date = salaries[0].date
+        end_date = salaries[-1].date
+
+        # Start date should always be tax year
+        assert start_date.month == tax_year_start_month
+        assert start_date.day == tax_year_start_day
+
+        # First day of *next* tax year
+        tax_year_end_date = datetime.date(
+            start_date.year+1, start_date.month, start_date.day)
+        tax_year_days = (tax_year_end_date - start_date).days
+
+        # Should never get salary records after until_date
+        assert end_date <= until_date
+
+        # Compute total earnings earned *after or on* the from_date.
+        earnings_after_from_date = fractions.Fraction(0, 1)
+        for salary_start, salary_end in zip(salaries, salaries[1:]):
+            salary_start_date = max(salary_start.date, from_date)
+            salary_end_date = max(salary_start_date, salary_end.date)
+
+            # how many days in this range?
+            days = (salary_end_date - salary_start_date).days
+            earnings_after_from_date += fractions.Fraction(
+                days * salary_start.base_salary, tax_year_days)
+        earnings_after_from_date = round(earnings_after_from_date)
+        assert earnings_after_from_date >= 0
+        assert earnings_after_from_date <= cost.salary
+
+        # commitment is share of total cost weighted by the ratio of earnings after from date to
+        # total earnings for that year
+        commitment = round(fractions.Fraction(earnings_after_from_date, cost.salary) * cost.total)
+        expenditure = cost.total - commitment
+
+        explanations.append(CommitmentExplanation(
+            tax_year=start_date.year, salary=cost.salary,
+            salary_to_come=earnings_after_from_date,
+            expenditure=expenditure, commitment=commitment,
+            salaries=salaries, cost=cost
+        ))
+
+        total_commitment += commitment
+
+    return total_commitment, explanations
+
+
+_CommitmentExplanation = collections.namedtuple(
+    'CommitmentExplanation',
+    'tax_year salary salary_to_come expenditure commitment salaries cost')
+
+
+class CommitmentExplanation(_CommitmentExplanation):
+    """
+    An explanation of the commitment calculation for a given tax year.
+
+    .. py:attribute:: tax_year
+
+        Integer giving the calendar year when the tax year started
 
     .. py:attribute:: salary
 
-        Base salary for the employee.
+        Total base salary for the tax year
 
-    .. py:attribute:: exchange
+    .. py:attribute:: salary_to_come
 
-        Amount of base salary exchanged as part of a salary exchange pension. By convention, this
-        value is negative if non-zero.
+        Salary which is yet to come. I.e. the salary which has not yet been earned as of the "from"
+        date.
 
-    .. py:attribute:: employer_pension
+    .. py:attribute:: expenditure
 
-        Employer pension contribution including any salary exchange amount.
+        The expenditure for this tax year. I.e. the amount of total cost of employment which has
+        already been spent.
 
-    .. py:attribute:: employer_nic
+    .. py:attribute:: commitment
 
-        Employer National Insurance contribution
+        The commitment for this tax year. This is the total cost of employment minus the
+        expenditure.
 
-    .. py:attribute:: apprenticeship_levy
+    .. py:attribute:: salaries
 
-        Share of Apprenticeship Levy from this employee
+        A list of :py:class:`~.SalaryRecord` tuples which
+        explain why the employee's salary is what it is during the tax year.
 
-    .. py:attribute:: total
+    .. py:attribute:: cost
 
-        Total on-cost of employing this employee. See note above about situations where this value
-        may not be the sum of the others.
-
+        A :py:class:`~.Cost` tuple explaining the total cost of employment for the tax year.
     """
-
-
-class Scheme(enum.Enum):
-    """
-    Possible pension schemes an employee can be a member of.
-
-    """
-
-    #: No pension scheme.
-    NONE = 'none'
-
-    #: CPS hybrid
-    CPS_HYBRID = 'cps_hybrid'
-
-    #: CPS hybrid with salary exchange
-    CPS_HYBRID_EXCHANGE = 'cps_hybrid_exchange'
-
-    #: USS
-    USS = 'uss'
-
-    #: USS with salary exchange
-    USS_EXCHANGE = 'uss_exchange'
-
-    #: NHS
-    NHS = 'nhs'
-
-
-#: Special value to pass to :py:func:`~.on_cost` to represent the latest tax year which has an
-#: implementation.
-LATEST = 'LATEST'
-
-
-def on_cost(base_salary, scheme, year=LATEST):
-    """
-    Return a :py:class:`OnCost` instance given a tax year, pension scheme and base salary.
-
-    :param int year: tax year
-    :param Scheme scheme: pension scheme
-    :param int base_salary: base salary of employee
-
-    :raises NotImplementedError: if there is not an implementation for the specified tax year and
-        pension scheme.
-
-    """
-    year = _LATEST_TAX_YEAR if year is LATEST else year
-
-    try:
-        calculator = _ON_COST_CALCULATORS[year][scheme]
-    except KeyError:
-        raise NotImplementedError()
-
-    return calculator(base_salary)
-
-
-def _on_cost_calculator(employer_nic_cb,
-                        employer_pension_cb=lambda _: 0,
-                        exchange_cb=lambda _: 0,
-                        apprenticeship_levy_cb=tax.standard_apprenticeship_levy):
-    """
-    Return a callable which will calculate an OnCost entry from a base salary. Arguments which are
-    callables each take a single argument which is a :py:class:`fractions.Fraction` instance
-    representing the base salary of the employee. They should return a
-    :py:class:`fractions.Fraction` instance.
-
-    :param employer_pension_cb: callable which gives employer pension contribution from base
-        salary.
-    :param employer_nic_cb: callable which gives employer National Insurance contribution from
-        base salary.
-    :param exchange_cb: callable which gives amount of salary sacrificed in a salary exchange
-        scheme from base salary.
-    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from base
-        salary.
-
-    """
-    def on_cost(base_salary):
-        # Ensure base salary is a rational
-        base_salary = fractions.Fraction(base_salary)
-
-        # We use the convention that the salary exchange value is negative to match the exchange
-        # column in HR tables.
-        exchange = -exchange_cb(base_salary)
-
-        # The employer pension contribution is the contribution based on base salary along with
-        # the employee contribution sacrificed from their salary.
-        employer_pension = employer_pension_cb(base_salary) - exchange
-
-        # the taxable salary is the base less the amount sacrificed. HR would appear to round the
-        # sacrifice first
-        taxable_salary = base_salary + _excel_round(exchange)
-
-        # The employer's NIC is calculated on the taxable salary.
-        employer_nic = employer_nic_cb(taxable_salary)
-
-        # The Apprenticeship Levy is calculated on the taxable salary.
-        apprenticeship_levy = apprenticeship_levy_cb(taxable_salary)
-
-        # The total is calculated using the rounded values.
-        total = (
-            _excel_round(base_salary)
-            + _excel_round(exchange)
-            + _excel_round(employer_pension)
-            + _excel_round(employer_nic)
-            + _excel_round(apprenticeship_levy)
-        )
-
-        # Round all of the values. Note the odd rounding for exchange. This matters since the
-        # tables HR generate seem to include -_excel_round(-exchange) even though the total column
-        # is calculated using _excel_round(exchange). Since Excel always rounds halves up, this
-        # means that _excel_round(exchange) does not, in general, equal -_excel_round(-exchange) as
-        # you might expect. Caveat programmer!
-
-        return OnCost(
-            salary=_excel_round(base_salary),
-            exchange=-_excel_round(-exchange),
-            employer_pension=_excel_round(employer_pension),
-            employer_nic=_excel_round(employer_nic),
-            apprenticeship_levy=_excel_round(apprenticeship_levy),
-            total=_excel_round(total),
-        )
-
-    return on_cost
-
-
-def _excel_round(n):
-    """
-    A version of round() which applies the Excel rule that halves rounds *up* rather than the
-    conventional wisdom that they round to the nearest even.
-
-    (The jury is out about whether Excel really rounds away from zero or up but rounding up matches
-    the tables produced by HR.)
-
-    """
-    # Ensure input is a rational
-    n = fractions.Fraction(n)
-    if n.denominator == 2:
-        # always round up halves
-        return math.ceil(n)
-    return round(n)
-
-
-#: On cost calculators keyed initially by year and then by scheme identifier.
-_ON_COST_CALCULATORS = {
-    2018: {
-        # An employee with no scheme in tax year 2018/19
-        Scheme.NONE: _on_cost_calculator(
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with USS in tax year 2018/19
-        Scheme.USS: _on_cost_calculator(
-            employer_pension_cb=pension.uss_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with USS and salary exchange in tax year 2018/19
-        Scheme.USS_EXCHANGE: _on_cost_calculator(
-            employer_pension_cb=pension.uss_employer_contribution,
-            exchange_cb=pension.uss_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS in tax year 2018/19
-        Scheme.CPS_HYBRID: _on_cost_calculator(
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS and salary exchange in tax year 2018/19
-        Scheme.CPS_HYBRID_EXCHANGE: _on_cost_calculator(
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            exchange_cb=pension.cps_hybrid_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee on the NHS scheme in tax year 2018/19
-        Scheme.NHS: _on_cost_calculator(
-            employer_pension_cb=pension.nhs_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-    },
-}
-
-_LATEST_TAX_YEAR = max(_ON_COST_CALCULATORS.keys())

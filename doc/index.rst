@@ -2,7 +2,6 @@ University of Cambridge Staff On-costs Calculator
 =================================================
 
 .. toctree::
-    :maxdepth: 2
     :hidden:
 
 The ``ucamstaffoncosts`` module calculates total on-costs associated with
@@ -26,40 +25,234 @@ Installation is best done via pip:
 Example
 -------
 
-The functionality of the module is exposed through a single function,
-:py:func:`~ucamstaffoncosts.on_cost`, which takes a tax year, pension scheme and
-base salary and returns an :py:class:`~ucamstaffoncosts.OnCost` object
-representing the on-costs for that employee:
+Our example employee will have the following attributes:
 
-.. doctest::
-    :options: +NORMALIZE_WHITESPACE
+- They are currently at the bottom of grade 2:
 
-    >>> import ucamstaffoncosts
-    >>> ucamstaffoncosts.on_cost(base_salary=25000,
-    ...                          scheme=ucamstaffoncosts.Scheme.USS, year=2018)
-    OnCost(salary=25000, exchange=0, employer_pension=4500,
-           employer_nic=2287, apprenticeship_levy=125, total=31912)
+    >>> from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES
+    >>> initial_grade = Grade.GRADE_2
+    >>> initial_point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(initial_grade)
 
-The :py:attr:`~ucamstaffoncosts.OnCost.total` attribute from the return value
-can be used to forecast total expenditure for an employee in a given tax year.
+- Their next employment anniversary is on the 1st June 2016:
 
-If *year* is omitted, then the latest tax year which has any calculators
-implemented is used. This behaviour can also be signalled by using the special
-value :py:const:`~ucamstaffoncosts.LATEST`:
+    >>> next_anniversary_date = datetime.date(2016, 6, 1)
 
-.. doctest::
-    :options: +NORMALIZE_WHITESPACE
+- They are on the USS salary exchange pension scheme:
 
-    >>> import ucamstaffoncosts
-    >>> ucamstaffoncosts.on_cost(base_salary=25000,
-    ...                          scheme=ucamstaffoncosts.Scheme.USS,
-    ...                          year=ucamstaffoncosts.LATEST)
-    OnCost(salary=25000, exchange=0, employer_pension=4500,
-           employer_nic=2287, apprenticeship_levy=125, total=31912)
-    >>> ucamstaffoncosts.on_cost(base_salary=25000,
-    ...                          scheme=ucamstaffoncosts.Scheme.USS)
-    OnCost(salary=25000, exchange=0, employer_pension=4500,
-           employer_nic=2287, apprenticeship_levy=125, total=31912)
+    >>> scheme = Scheme.USS_EXCHANGE
+
+- Their contract ends on 30th September and so they are no-longer employed from
+  the 1st October:
+
+    >>> until_date = datetime.date(2020, 10, 1)
+
+- The date from which we want to calculate the commitments is the 1st February
+  2016:
+
+    >>> from_date = datetime.date(2016, 2, 1)
+
+We can use the :py:func:`~.calculate_commitment` function to calculate the total
+commitment for employing this staff member as of *from_date*:
+
+>>> import ucamstaffoncosts
+>>> total, explanations = ucamstaffoncosts.calculate_commitment(
+...     until_date, initial_grade, initial_point, scheme,
+...     from_date=from_date, next_anniversary_date=next_anniversary_date,
+...     scale_table=EXAMPLE_SALARY_SCALES)
+>>> total
+90245
+
+This number seems a little arbitrary so we can use the provided list of
+explanations to explain the calculation:
+
+>>> from ucamstaffoncosts.util import pprinttable
+>>> running_commitment = 0
+>>> for explanation in explanations:
+...     print('=' * 60)
+...     print('TAX YEAR: {}/{}'.format(explanation.tax_year, explanation.tax_year+1))
+...     print('\nSalaries\n--------\n')
+...     pprinttable(explanation.salaries)
+...     print('\nCosts\n-----')
+...     if explanation.cost.tax_year != explanation.tax_year:
+...         print('(approximated using tax tables for {})'.format(explanation.cost.tax_year))
+...     print('\n')
+...     pprinttable([explanation.cost])
+...     print('\nSalary for year: {}'.format(explanation.salary))
+...     print('Salary earned after {}: {}'.format(from_date, explanation.salary_to_come))
+...     print('Expenditure until {}: {}'.format(from_date, explanation.expenditure))
+...     print('Commitment from {}: {}'.format(from_date, explanation.commitment))
+...     running_commitment += explanation.commitment
+...     print('Running total commitment: {}'.format(running_commitment))
+...     print('\n') # doctest: +NORMALIZE_WHITESPACE
+============================================================
+TAX YEAR: 2015/2016
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                         | grade         | point | base_salary | mapping_table_date
+-----------+--------------------------------+---------------+-------+-------------+-------------------
+2015-04-06 | start of tax year              | Grade.GRADE_2 | P3    | 14254       | 2014-08-01
+2015-08-01 | new salary table (approximate) | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
+2016-04-06 | end of tax year                | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+14448  | -1156    | 3756             | 672          | 66                  | 17786 | 2018
+<BLANKLINE>
+Salary for year: 14448
+Salary earned after 2016-02-01: 2582
+Expenditure until 2016-02-01: 14607
+Commitment from 2016-02-01: 3179
+Running total commitment: 3179
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2016/2017
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                      | grade         | point | base_salary | mapping_table_date
+-----------+-----------------------------+---------------+-------+-------------+-------------------
+2016-04-06 | start of tax year           | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
+2016-06-01 | anniversary: point P3 to P4 | Grade.GRADE_2 | P4    | 14818       | 2015-08-01
+2016-08-01 | new salary table            | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
+2017-04-06 | end of tax year             | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018
+<BLANKLINE>
+Salary for year: 14934
+Salary earned after 2016-02-01: 14934
+Expenditure until 2016-02-01: 0
+Commitment from 2016-02-01: 18423
+Running total commitment: 21602
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2017/2018
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                      | grade         | point | base_salary | mapping_table_date
+-----------+-----------------------------+---------------+-------+-------------+-------------------
+2017-04-06 | start of tax year           | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
+2017-06-01 | anniversary: point P4 to P5 | Grade.GRADE_2 | P5    | 15356       | 2016-08-01
+2017-08-01 | new salary table            | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
+2018-04-06 | end of tax year             | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018
+<BLANKLINE>
+Salary for year: 15557
+Salary earned after 2016-02-01: 15557
+Expenditure until 2016-02-01: 0
+Commitment from 2016-02-01: 19241
+Running total commitment: 40843
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2018/2019
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                         | grade         | point | base_salary | mapping_table_date
+-----------+--------------------------------+---------------+-------+-------------+-------------------
+2018-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
+2018-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
+2019-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
+<BLANKLINE>
+Costs
+-----
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018
+<BLANKLINE>
+Salary for year: 15934
+Salary earned after 2016-02-01: 15934
+Expenditure until 2016-02-01: 0
+Commitment from 2016-02-01: 19735
+Running total commitment: 60578
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2019/2020
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                         | grade         | point | base_salary | mapping_table_date
+-----------+--------------------------------+---------------+-------+-------------+-------------------
+2019-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
+2019-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
+2020-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018
+<BLANKLINE>
+Salary for year: 16253
+Salary earned after 2016-02-01: 16253
+Expenditure until 2016-02-01: 0
+Commitment from 2016-02-01: 20154
+Running total commitment: 80732
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2020/2021
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                         | grade         | point | base_salary | mapping_table_date
+-----------+--------------------------------+---------------+-------+-------------+-------------------
+2020-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
+2020-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16683       | 2020-08-01
+2020-10-01 | end of employment              | Grade.GRADE_2 | P5    | 16683       | 2020-08-01
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018
+<BLANKLINE>
+Salary for year: 8031
+Salary earned after 2016-02-01: 8031
+Expenditure until 2016-02-01: 0
+Commitment from 2016-02-01: 9513
+Running total commitment: 90245
+<BLANKLINE>
+<BLANKLINE>
 
 
 Reference
@@ -67,3 +260,19 @@ Reference
 
 .. automodule:: ucamstaffoncosts
     :members:
+    :member-order: bysource
+
+.. automodule:: ucamstaffoncosts.costs
+    :members:
+    :member-order: bysource
+    :exclude-members: Scheme, Cost
+
+.. automodule:: ucamstaffoncosts.salary.progression
+    :members:
+    :member-order: bysource
+    :exclude-members: SalaryRecord
+
+.. automodule:: ucamstaffoncosts.salary.scales
+    :members:
+    :member-order: bysource
+    :exclude-members: Grade
