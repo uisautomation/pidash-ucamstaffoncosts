@@ -9,12 +9,12 @@ def _make_nic_calculator(boundaries):
     Return a NIC calculator which implements the usual method of calculation where NICs are
     calculated on different salary bands with differing rates.
 
-    Returns a function which takes a gross salary as input and returns the employer NIC.
+    Returns a function which takes a base salary as input and returns the employer NIC.
 
     """
-    def calculate(gross_salary):
-        # Make sure gross salary is rational
-        gross_salary = fractions.Fraction(gross_salary)
+    def calculate(base_salary):
+        # Make sure base salary is rational
+        base_salary = fractions.Fraction(base_salary)
 
         # Keep track of bottom of current boundary
         boundary_bottom = fractions.Fraction(0)
@@ -25,13 +25,13 @@ def _make_nic_calculator(boundaries):
         for boundary_top, rate in boundaries:
             # Note: boundary_top being None signals "infinity"
 
-            if boundary_top is not None and gross_salary >= boundary_top:
+            if boundary_top is not None and base_salary >= boundary_top:
                 # Salary entirely encompasses this entire range
                 contribution += (boundary_top-boundary_bottom) * rate
-            elif gross_salary > boundary_bottom and (boundary_top is None
-                                                     or gross_salary < boundary_top):
+            elif base_salary > boundary_bottom and (boundary_top is None
+                                                    or base_salary < boundary_top):
                 # Salary is in top-most range
-                contribution += (gross_salary-boundary_bottom) * rate
+                contribution += (base_salary-boundary_bottom) * rate
 
             boundary_bottom = boundary_top
 
@@ -51,10 +51,10 @@ TABLE_A_EMPLOYER_NIC = {
 }
 
 
-def standard_apprenticeship_levy(gross_salary):
+def standard_apprenticeship_levy(base_salary):
     """
     Return the standard Apprenticeship Levy assuming no special circumstances. Note that HR round
     this figure *down* in on-costs tables.
 
     """
-    return math.floor(gross_salary * rates.APPRENTICESHIP_LEVY_RATE)
+    return math.floor(base_salary * rates.APPRENTICESHIP_LEVY_RATE)

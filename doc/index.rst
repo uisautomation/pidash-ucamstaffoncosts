@@ -28,14 +28,14 @@ Example
 
 The functionality of the module is exposed through a single function,
 :py:func:`~ucamstaffoncosts.on_cost`, which takes a tax year, pension scheme and
-gross salary and returns an :py:class:`~ucamstaffoncosts.OnCost` object
+base salary and returns an :py:class:`~ucamstaffoncosts.OnCost` object
 representing the on-costs for that employee:
 
 .. doctest::
     :options: +NORMALIZE_WHITESPACE
 
     >>> import ucamstaffoncosts
-    >>> ucamstaffoncosts.on_cost(gross_salary=25000,
+    >>> ucamstaffoncosts.on_cost(base_salary=25000,
     ...                          scheme=ucamstaffoncosts.Scheme.USS, year=2018)
     OnCost(salary=25000, exchange=0, employer_pension=4500,
            employer_nic=2287, apprenticeship_levy=125, total=31912)
@@ -51,12 +51,12 @@ value :py:const:`~ucamstaffoncosts.LATEST`:
     :options: +NORMALIZE_WHITESPACE
 
     >>> import ucamstaffoncosts
-    >>> ucamstaffoncosts.on_cost(gross_salary=25000,
+    >>> ucamstaffoncosts.on_cost(base_salary=25000,
     ...                          scheme=ucamstaffoncosts.Scheme.USS,
     ...                          year=ucamstaffoncosts.LATEST)
     OnCost(salary=25000, exchange=0, employer_pension=4500,
            employer_nic=2287, apprenticeship_levy=125, total=31912)
-    >>> ucamstaffoncosts.on_cost(gross_salary=25000,
+    >>> ucamstaffoncosts.on_cost(base_salary=25000,
     ...                          scheme=ucamstaffoncosts.Scheme.USS)
     OnCost(salary=25000, exchange=0, employer_pension=4500,
            employer_nic=2287, apprenticeship_levy=125, total=31912)

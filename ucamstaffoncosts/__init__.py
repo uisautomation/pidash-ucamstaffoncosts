@@ -13,7 +13,7 @@ _OnCost = collections.namedtuple(
 
 
 class OnCost(_OnCost):
-    """An individual on-costs calculation for a gross salary.
+    """An individual on-costs calculation for a base salary.
 
     .. note::
 
@@ -22,11 +22,11 @@ class OnCost(_OnCost):
 
     .. py:attribute:: salary
 
-        Gross salary for the employee.
+        Base salary for the employee.
 
     .. py:attribute:: exchange
 
-        Amount of gross salary exchanged as part of a salary exchange pension. By convention, this
+        Amount of base salary exchanged as part of a salary exchange pension. By convention, this
         value is negative if non-zero.
 
     .. py:attribute:: employer_pension
@@ -79,13 +79,13 @@ class Scheme(enum.Enum):
 LATEST = 'LATEST'
 
 
-def on_cost(gross_salary, scheme, year=LATEST):
+def on_cost(base_salary, scheme, year=LATEST):
     """
-    Return a :py:class:`OnCost` instance given a tax year, pension scheme and gross salary.
+    Return a :py:class:`OnCost` instance given a tax year, pension scheme and base salary.
 
     :param int year: tax year
     :param Scheme scheme: pension scheme
-    :param int gross_salary: gross salary of employee
+    :param int base_salary: base salary of employee
 
     :raises NotImplementedError: if there is not an implementation for the specified tax year and
         pension scheme.
@@ -98,7 +98,7 @@ def on_cost(gross_salary, scheme, year=LATEST):
     except KeyError:
         raise NotImplementedError()
 
-    return calculator(gross_salary)
+    return calculator(base_salary)
 
 
 def _on_cost_calculator(employer_nic_cb,
@@ -106,36 +106,36 @@ def _on_cost_calculator(employer_nic_cb,
                         exchange_cb=lambda _: 0,
                         apprenticeship_levy_cb=tax.standard_apprenticeship_levy):
     """
-    Return a callable which will calculate an OnCost entry from a gross salary. Arguments which are
+    Return a callable which will calculate an OnCost entry from a base salary. Arguments which are
     callables each take a single argument which is a :py:class:`fractions.Fraction` instance
-    representing the gross salary of the employee. They should return a
+    representing the base salary of the employee. They should return a
     :py:class:`fractions.Fraction` instance.
 
-    :param employer_pension_cb: callable which gives employer pension contribution from gross
+    :param employer_pension_cb: callable which gives employer pension contribution from base
         salary.
     :param employer_nic_cb: callable which gives employer National Insurance contribution from
-        gross salary.
+        base salary.
     :param exchange_cb: callable which gives amount of salary sacrificed in a salary exchange
-        scheme from gross salary.
-    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from gross
+        scheme from base salary.
+    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from base
         salary.
 
     """
-    def on_cost(gross_salary):
-        # Ensure gross salary is a rational
-        gross_salary = fractions.Fraction(gross_salary)
+    def on_cost(base_salary):
+        # Ensure base salary is a rational
+        base_salary = fractions.Fraction(base_salary)
 
         # We use the convention that the salary exchange value is negative to match the exchange
         # column in HR tables.
-        exchange = -exchange_cb(gross_salary)
+        exchange = -exchange_cb(base_salary)
 
-        # The employer pension contribution is the contribution based on gross salary along with
+        # The employer pension contribution is the contribution based on base salary along with
         # the employee contribution sacrificed from their salary.
-        employer_pension = employer_pension_cb(gross_salary) - exchange
+        employer_pension = employer_pension_cb(base_salary) - exchange
 
-        # the taxable salary is the gross less the amount sacrificed. HR would appear to round the
+        # the taxable salary is the base less the amount sacrificed. HR would appear to round the
         # sacrifice first
-        taxable_salary = gross_salary + _excel_round(exchange)
+        taxable_salary = base_salary + _excel_round(exchange)
 
         # The employer's NIC is calculated on the taxable salary.
         employer_nic = employer_nic_cb(taxable_salary)
@@ -145,7 +145,7 @@ def _on_cost_calculator(employer_nic_cb,
 
         # The total is calculated using the rounded values.
         total = (
-            _excel_round(gross_salary)
+            _excel_round(base_salary)
             + _excel_round(exchange)
             + _excel_round(employer_pension)
             + _excel_round(employer_nic)
@@ -159,7 +159,7 @@ def _on_cost_calculator(employer_nic_cb,
         # you might expect. Caveat programmer!
 
         return OnCost(
-            salary=_excel_round(gross_salary),
+            salary=_excel_round(base_salary),
             exchange=-_excel_round(-exchange),
             employer_pension=_excel_round(employer_pension),
             employer_nic=_excel_round(employer_nic),
