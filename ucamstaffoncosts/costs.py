@@ -290,7 +290,7 @@ def calculate_cost(base_salary, scheme, year=LATEST):
 
 
 def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
-                      start_date=None, next_anniversary_date=None,
+                      occupancy=1, start_date=None, next_anniversary_date=None,
                       tax_year_start_month=4, tax_year_start_day=6,
                       until_date=None, **kwargs):
     """
@@ -332,6 +332,8 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
                  mapping_table_date=datetime.date(2015, 8, 1))
 
     """
+    occupancy_fraction = fractions.Fraction(occupancy)
+
     for year in itertools.count(from_year):
         from_date = datetime.date(year, tax_year_start_month, tax_year_start_day)
         if until_date is not None and from_date >= until_date:
@@ -390,8 +392,8 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
             days = (end.date - start.date).days
             total_salary += fractions.Fraction(days * start.base_salary, tax_year_days)
 
-        # Compute total salary earned this year
-        total_salary = round(total_salary)
+        # Compute total salary earned this year taking into account occupancy
+        total_salary = round(total_salary * occupancy_fraction)
 
         # Attempt to use this tax year for on-cost calculation, falling back to LATEST
         try:
