@@ -36,14 +36,14 @@ def calculate_commitment(until_date, initial_grade, initial_point, scheme,
     >>> scheme = Scheme.USS_EXCHANGE
     >>> next_anniversary_date = datetime.date(2016, 6, 1)
     >>> from_date = next_anniversary_date - datetime.timedelta(days=400)
-    >>> until_date = datetime.datetime.now().date() + datetime.timedelta(days=1000)
+    >>> until_date = from_date + datetime.timedelta(days=1000)
 
     >>> total, _ = calculate_commitment(
     ...     until_date, initial_grade, initial_point, scheme,
     ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
     ...     scale_table=EXAMPLE_SALARY_SCALES)
     >>> total
-    113127
+    50214
 
     Note that the first tax year will contain the *from_date*:
 
