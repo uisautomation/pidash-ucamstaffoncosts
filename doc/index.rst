@@ -41,6 +41,10 @@ Our example employee will have the following attributes:
 
     >>> scheme = Scheme.USS_EXCHANGE
 
+- Their contract started on 1st April 2015:
+
+    >>> start_date = datetime.date(2015, 4, 1)
+
 - Their contract ends on 30th September and so they are no-longer employed from
   the 1st October:
 
@@ -51,15 +55,18 @@ Our example employee will have the following attributes:
 
     >>> from_date = datetime.date(2016, 2, 1)
 
-We can use the :py:func:`~.calculate_commitment` function to calculate the total
-commitment for employing this staff member as of *from_date*:
+We can use the :py:func:`~.employment_expenditure_and_commitments` function to
+calculate the total commitment for employing this staff member as of
+*from_date*:
 
 >>> import ucamstaffoncosts
->>> total, explanations = ucamstaffoncosts.calculate_commitment(
-...     until_date, initial_grade, initial_point, scheme,
+>>> expenditure, commitments, explanations = ucamstaffoncosts.employment_expenditure_and_commitments(
+...     until_date, initial_grade, initial_point, scheme, start_date=start_date,
 ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
 ...     scale_table=EXAMPLE_SALARY_SCALES)
->>> total
+>>> expenditure
+14837
+>>> commitments
 90245
 
 This number seems a little arbitrary so we can use the provided list of
@@ -92,11 +99,10 @@ TAX YEAR: 2015/2016
 Salaries
 --------
 <BLANKLINE>
-date       | reason                         | grade         | point | base_salary | mapping_table_date
------------+--------------------------------+---------------+-------+-------------+-------------------
-2015-04-06 | start of tax year              | Grade.GRADE_2 | P3    | 14254       | 2014-08-01
-2015-08-01 | new salary table (approximate) | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
-2016-04-06 | end of tax year                | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
+date       | reason          | grade         | point | base_salary | mapping_table_date
+-----------+-----------------+---------------+-------+-------------+-------------------
+2015-04-01 | employee start  | Grade.GRADE_2 | P3    | 14254       | 2014-08-01        
+2015-04-06 | end of tax year | Grade.GRADE_2 | P3    | 14254       | 2014-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -105,7 +111,35 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-14448  | -1156    | 3756             | 672          | 66                  | 17786 | 2018
+195    | -16      | 51               | 0            | 0                   | 230   | 2018    
+<BLANKLINE>
+Salary for year: 195
+Salary earned after 2016-02-01: 0
+Expenditure until 2016-02-01: 230
+Commitment from 2016-02-01: 0
+Running total commitment: 0
+<BLANKLINE>
+<BLANKLINE>
+============================================================
+TAX YEAR: 2015/2016
+<BLANKLINE>
+Salaries
+--------
+<BLANKLINE>
+date       | reason                         | grade         | point | base_salary | mapping_table_date
+-----------+--------------------------------+---------------+-------+-------------+-------------------
+2015-04-06 | start of tax year              | Grade.GRADE_2 | P3    | 14254       | 2014-08-01        
+2015-08-01 | new salary table (approximate) | Grade.GRADE_2 | P3    | 14539       | 2015-08-01        
+2016-04-06 | end of tax year                | Grade.GRADE_2 | P3    | 14539       | 2015-08-01        
+<BLANKLINE>
+Costs
+-----
+(approximated using tax tables for 2018)
+<BLANKLINE>
+<BLANKLINE>
+salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
+-------+----------+------------------+--------------+---------------------+-------+---------
+14448  | -1156    | 3756             | 672          | 66                  | 17786 | 2018    
 <BLANKLINE>
 Salary for year: 14448
 Salary earned after 2016-02-01: 2582
@@ -122,10 +156,10 @@ Salaries
 <BLANKLINE>
 date       | reason                      | grade         | point | base_salary | mapping_table_date
 -----------+-----------------------------+---------------+-------+-------------+-------------------
-2016-04-06 | start of tax year           | Grade.GRADE_2 | P3    | 14539       | 2015-08-01
-2016-06-01 | anniversary: point P3 to P4 | Grade.GRADE_2 | P4    | 14818       | 2015-08-01
-2016-08-01 | new salary table            | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
-2017-04-06 | end of tax year             | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
+2016-04-06 | start of tax year           | Grade.GRADE_2 | P3    | 14539       | 2015-08-01        
+2016-06-01 | anniversary: point P3 to P4 | Grade.GRADE_2 | P4    | 14818       | 2015-08-01        
+2016-08-01 | new salary table            | Grade.GRADE_2 | P4    | 15052       | 2016-08-01        
+2017-04-06 | end of tax year             | Grade.GRADE_2 | P4    | 15052       | 2016-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -134,7 +168,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018
+14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018    
 <BLANKLINE>
 Salary for year: 14934
 Salary earned after 2016-02-01: 14934
@@ -151,10 +185,10 @@ Salaries
 <BLANKLINE>
 date       | reason                      | grade         | point | base_salary | mapping_table_date
 -----------+-----------------------------+---------------+-------+-------------+-------------------
-2017-04-06 | start of tax year           | Grade.GRADE_2 | P4    | 15052       | 2016-08-01
-2017-06-01 | anniversary: point P4 to P5 | Grade.GRADE_2 | P5    | 15356       | 2016-08-01
-2017-08-01 | new salary table            | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
-2018-04-06 | end of tax year             | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
+2017-04-06 | start of tax year           | Grade.GRADE_2 | P4    | 15052       | 2016-08-01        
+2017-06-01 | anniversary: point P4 to P5 | Grade.GRADE_2 | P5    | 15356       | 2016-08-01        
+2017-08-01 | new salary table            | Grade.GRADE_2 | P5    | 15721       | 2017-08-01        
+2018-04-06 | end of tax year             | Grade.GRADE_2 | P5    | 15721       | 2017-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -163,7 +197,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018
+15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018    
 <BLANKLINE>
 Salary for year: 15557
 Salary earned after 2016-02-01: 15557
@@ -180,9 +214,9 @@ Salaries
 <BLANKLINE>
 date       | reason                         | grade         | point | base_salary | mapping_table_date
 -----------+--------------------------------+---------------+-------+-------------+-------------------
-2018-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 15721       | 2017-08-01
-2018-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
-2019-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
+2018-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 15721       | 2017-08-01        
+2018-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16035       | 2018-08-01        
+2019-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16035       | 2018-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -190,7 +224,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018
+15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018    
 <BLANKLINE>
 Salary for year: 15934
 Salary earned after 2016-02-01: 15934
@@ -207,9 +241,9 @@ Salaries
 <BLANKLINE>
 date       | reason                         | grade         | point | base_salary | mapping_table_date
 -----------+--------------------------------+---------------+-------+-------------+-------------------
-2019-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16035       | 2018-08-01
-2019-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
-2020-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
+2019-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16035       | 2018-08-01        
+2019-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16356       | 2019-08-01        
+2020-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16356       | 2019-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -218,7 +252,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018
+16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018    
 <BLANKLINE>
 Salary for year: 16253
 Salary earned after 2016-02-01: 16253
@@ -235,9 +269,9 @@ Salaries
 <BLANKLINE>
 date       | reason                         | grade         | point | base_salary | mapping_table_date
 -----------+--------------------------------+---------------+-------+-------------+-------------------
-2020-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16356       | 2019-08-01
-2020-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16683       | 2020-08-01
-2020-10-01 | end of employment              | Grade.GRADE_2 | P5    | 16683       | 2020-08-01
+2020-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16356       | 2019-08-01        
+2020-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16683       | 2020-08-01        
+2020-10-01 | end of employment              | Grade.GRADE_2 | P5    | 16683       | 2020-08-01        
 <BLANKLINE>
 Costs
 -----
@@ -246,7 +280,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018
+8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018    
 <BLANKLINE>
 Salary for year: 8031
 Salary earned after 2016-02-01: 8031
@@ -255,7 +289,6 @@ Commitment from 2016-02-01: 9513
 Running total commitment: 90245
 <BLANKLINE>
 <BLANKLINE>
-
 
 Reference
 ---------

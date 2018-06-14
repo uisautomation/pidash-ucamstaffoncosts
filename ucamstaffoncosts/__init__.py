@@ -16,16 +16,24 @@ from .salary.progression import SalaryRecord
 from .salary.scales import Grade
 
 
-__all__ = ['calculate_commitment', 'CommitmentExplanation', 'Scheme', 'Grade', 'Cost',
-           'SalaryRecord']
+__all__ = [
+    'employment_expenditure_and_commitments', 'CommitmentExplanation', 'Scheme', 'Grade', 'Cost',
+    'SalaryRecord'
+]
 
 
-def calculate_commitment(until_date, initial_grade, initial_point, scheme,
-                         from_date=None, tax_year_start_month=4, tax_year_start_day=6,
-                         **kwargs):
+def employment_expenditure_and_commitments(until_date, initial_grade, initial_point, scheme,
+                                           start_date=None, from_date=None, tax_year_start_month=4,
+                                           tax_year_start_day=6, **kwargs):
     """
-    Calculate the commitment remaining for an employee's contract. Returns a pair giving the total
-    commitment and a list of :py:class:`CommitmentExplanation` tuples explaining the calculation.
+    Calculate the existing expenditure and remaining commitments for an employee's contract.
+    Returns a pair giving the total commitment and a list of :py:class:`CommitmentExplanation`
+    tuples explaining the calculation.
+
+    :param from_date: date at which to differentiate between expenditure and commitments. If
+        ``None``, today's date is used.
+    :param start_date: date at which employee started. Results will be returned from this date. If
+        ``None``, the "from date" is used.
 
     Remaining keyword arguments are passed to :py:func:`costs_by_tax_year`.
 
@@ -38,54 +46,53 @@ def calculate_commitment(until_date, initial_grade, initial_point, scheme,
     >>> from_date = next_anniversary_date - datetime.timedelta(days=400)
     >>> until_date = from_date + datetime.timedelta(days=1000)
 
-    >>> total, _ = calculate_commitment(
+    >>> expenditure, commitments, _ = employment_expenditure_and_commitments(
     ...     until_date, initial_grade, initial_point, scheme,
     ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
     ...     scale_table=EXAMPLE_SALARY_SCALES)
-    >>> total
-    50214
+    >>> expenditure
+    0
+    >>> commitments
+    50146
 
     Note that the first tax year will contain the *from_date*:
 
     >>> from_date = datetime.date(2016, 1, 1)
-    >>> _, explanations = calculate_commitment(
+    >>> _, _, explanations = employment_expenditure_and_commitments(
     ...     until_date, initial_grade, initial_point, scheme,
     ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
     ...     scale_table=EXAMPLE_SALARY_SCALES)
     >>> explanations[0].tax_year
-    2015
+    2016
 
     """
     from_date = from_date if from_date is not None else datetime.datetime.now().date()
+    start_date = start_date if start_date is not None else from_date
 
-    # Start from tax year containing from_date
-    from_year = from_date.year
-    if datetime.date(from_year, tax_year_start_month, tax_year_start_day) > from_date:
-        from_year -= 1
+    start_year = start_date.year
+    if datetime.date(start_year, tax_year_start_month, tax_year_start_day) > start_date:
+        start_year -= 1
 
     # Calculate costs
     all_costs = costs.costs_by_tax_year(
-        from_year, initial_grade, initial_point, scheme,
-        tax_year_start_month=tax_year_start_month,
+        start_year, initial_grade, initial_point, scheme,
+        start_date=start_date, tax_year_start_month=tax_year_start_month,
         tax_year_start_day=tax_year_start_day,
         until_date=until_date, **kwargs)
 
     explanations = []
 
-    total_commitment = 0
+    total_expenditure, total_commitment = 0, 0
     for year, cost, salaries in all_costs:
         # What range of dates does this cover?
         start_date = salaries[0].date
         end_date = salaries[-1].date
 
-        # Start date should always be tax year
-        assert start_date.month == tax_year_start_month
-        assert start_date.day == tax_year_start_day
-
-        # First day of *next* tax year
+        tax_year_start_date = datetime.date(
+            year, tax_year_start_month, tax_year_start_day)
         tax_year_end_date = datetime.date(
-            start_date.year+1, start_date.month, start_date.day)
-        tax_year_days = (tax_year_end_date - start_date).days
+            year+1, tax_year_start_month, tax_year_start_day)
+        tax_year_days = (tax_year_end_date - tax_year_start_date).days
 
         # Should never get salary records after until_date
         assert end_date <= until_date
@@ -116,9 +123,10 @@ def calculate_commitment(until_date, initial_grade, initial_point, scheme,
             salaries=salaries, cost=cost
         ))
 
+        total_expenditure += expenditure
         total_commitment += commitment
 
-    return total_commitment, explanations
+    return total_expenditure, total_commitment, explanations
 
 
 _CommitmentExplanation = collections.namedtuple(

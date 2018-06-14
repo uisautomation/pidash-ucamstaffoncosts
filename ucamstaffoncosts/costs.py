@@ -290,7 +290,7 @@ def calculate_cost(base_salary, scheme, year=LATEST):
 
 
 def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
-                      next_anniversary_date=None,
+                      start_date=None, next_anniversary_date=None,
                       tax_year_start_month=4, tax_year_start_day=6,
                       until_date=None, **kwargs):
     """
@@ -302,6 +302,8 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
     :param initial_grade: grade of employee at start of tax year
     :param initial_point: salary spine point of employee at start of tax year
     :param scheme: pension scheme of employee
+    :param start_date: date of employment start. If None, it is assumed the employee has been
+        employed since before the start of the tax year
     :param until_date: if None, employee is no longer employed on and after this date
 
     >>> from ucamstaffoncosts import Grade
@@ -338,6 +340,14 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
 
         to_date = datetime.date(year+1, tax_year_start_month, tax_year_start_day)
 
+        if start_date is not None and start_date >= from_date and start_date < to_date:
+            # Employee start date is within this tax year
+            initial_date = start_date
+            initial_reason = 'employee start'
+        else:
+            initial_date = from_date
+            initial_reason = 'start of tax year'
+
         # Total number of days in year
         tax_year_days = (to_date - from_date).days
 
@@ -356,7 +366,7 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
                     anniversary_date.year+1, anniversary_date.month, anniversary_date.day)
 
         salaries = list(progression.salary_progression(
-            from_date, initial_grade, initial_point, initial_reason='start of tax year',
+            initial_date, initial_grade, initial_point, initial_reason=initial_reason,
             until_date=to_date, next_anniversary_date=anniversary_date, **kwargs
         ))
 
