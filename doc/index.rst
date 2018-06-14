@@ -66,24 +66,26 @@ This number seems a little arbitrary so we can use the provided list of
 explanations to explain the calculation:
 
 >>> from ucamstaffoncosts.util import pprinttable
->>> running_commitment = 0
->>> for explanation in explanations:
-...     print('=' * 60)
-...     print('TAX YEAR: {}/{}'.format(explanation.tax_year, explanation.tax_year+1))
-...     print('\nSalaries\n--------\n')
-...     pprinttable(explanation.salaries)
-...     print('\nCosts\n-----')
-...     if explanation.cost.tax_year != explanation.tax_year:
-...         print('(approximated using tax tables for {})'.format(explanation.cost.tax_year))
-...     print('\n')
-...     pprinttable([explanation.cost])
-...     print('\nSalary for year: {}'.format(explanation.salary))
-...     print('Salary earned after {}: {}'.format(from_date, explanation.salary_to_come))
-...     print('Expenditure until {}: {}'.format(from_date, explanation.expenditure))
-...     print('Commitment from {}: {}'.format(from_date, explanation.commitment))
-...     running_commitment += explanation.commitment
-...     print('Running total commitment: {}'.format(running_commitment))
-...     print('\n') # doctest: +NORMALIZE_WHITESPACE
+>>> def print_explanations(explanations):
+...     running_commitment = 0
+...     for explanation in explanations:
+...         print('=' * 60)
+...         print('TAX YEAR: {}/{}'.format(explanation.tax_year, explanation.tax_year+1))
+...         print('\nSalaries\n--------\n')
+...         pprinttable(explanation.salaries)
+...         print('\nCosts\n-----')
+...         if explanation.cost.tax_year != explanation.tax_year:
+...             print('(approximated using tax tables for {})'.format(explanation.cost.tax_year))
+...         print('\n')
+...         pprinttable([explanation.cost])
+...         print('\nSalary for year: {}'.format(explanation.salary))
+...         print('Salary earned after {}: {}'.format(from_date, explanation.salary_to_come))
+...         print('Expenditure until {}: {}'.format(from_date, explanation.expenditure))
+...         print('Commitment from {}: {}'.format(from_date, explanation.commitment))
+...         running_commitment += explanation.commitment
+...         print('Running total commitment: {}'.format(running_commitment))
+...         print('\n')
+>>> print_explanations(explanations) # doctest: +NORMALIZE_WHITESPACE
 ============================================================
 TAX YEAR: 2015/2016
 <BLANKLINE>
