@@ -121,16 +121,16 @@ class Grade(enum.Enum):
     #: Grade 11
     GRADE_11 = enum.auto()
 
-    #: Grade 11
+    #: Grade 12 band 1
     GRADE_12_BAND_1 = enum.auto()
 
-    #: Grade 11
+    #: Grade 12 band 2
     GRADE_12_BAND_2 = enum.auto()
 
-    #: Grade 11
+    #: Grade 12 band 3
     GRADE_12_BAND_3 = enum.auto()
 
-    #: Grade 11
+    #: Grade 12 band 4
     GRADE_12_BAND_4 = enum.auto()
 
 
