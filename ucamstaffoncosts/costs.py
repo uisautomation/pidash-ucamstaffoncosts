@@ -214,6 +214,9 @@ class Scheme(enum.Enum):
     #: NHS
     NHS = enum.auto()
 
+    #: MRC
+    MRC = enum.auto()
+
 
 _Cost = collections.namedtuple(
     'Cost',
@@ -541,6 +544,13 @@ _ON_COST_CALCULATORS = {
         Scheme.NHS: _cost_calculator(
             tax_year=2018,
             employer_pension_cb=pension.nhs_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
+        ),
+
+        # An employee on the MRC scheme in tax year 2018/19
+        Scheme.MRC: _cost_calculator(
+            tax_year=2018,
+            employer_pension_cb=pension.mrc_employer_contribution,
             employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
         ),
     },
