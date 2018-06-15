@@ -331,15 +331,18 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
                  grade=<Grade.GRADE_2: 3>, point='P3', base_salary=14539,
                  mapping_table_date=datetime.date(2015, 8, 1))
 
+    If *until_date* is before the start of *from_year* tax year, no results are returned
+    >>> list(costs_by_tax_year(
+    ...     2016, initial_grade, initial_point, Scheme.USS_EXCHANGE,
+    ...     next_anniversary_date=next_anniversary_date,
+    ...     until_date=datetime.date(2016, 3, 1), scale_table=EXAMPLE_SALARY_SCALES))
+    []
+
     """
     occupancy_fraction = fractions.Fraction(occupancy)
 
     for year in itertools.count(from_year):
         from_date = datetime.date(year, tax_year_start_month, tax_year_start_day)
-        if until_date is not None and from_date >= until_date:
-            # we're done
-            return
-
         to_date = datetime.date(year+1, tax_year_start_month, tax_year_start_day)
 
         if start_date is not None and start_date >= from_date and start_date < to_date:
@@ -349,6 +352,10 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
         else:
             initial_date = from_date
             initial_reason = 'start of tax year'
+
+        if until_date is not None and initial_date >= until_date:
+            # we're done
+            return
 
         # Total number of days in year
         tax_year_days = (to_date - from_date).days
