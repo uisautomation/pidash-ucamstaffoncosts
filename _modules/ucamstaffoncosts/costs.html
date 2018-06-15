@@ -355,7 +355,10 @@
     <span class="n">USS_EXCHANGE</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
 
     <span class="c1">#: NHS</span>
-    <span class="n">NHS</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+    <span class="n">NHS</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: MRC</span>
+    <span class="n">MRC</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 
 <span class="n">_Cost</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
@@ -684,6 +687,13 @@
         <span class="n">Scheme</span><span class="o">.</span><span class="n">NHS</span><span class="p">:</span> <span class="n">_cost_calculator</span><span class="p">(</span>
             <span class="n">tax_year</span><span class="o">=</span><span class="mi">2018</span><span class="p">,</span>
             <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">nhs_employer_contribution</span><span class="p">,</span>
+            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
+        <span class="p">),</span>
+
+        <span class="c1"># An employee on the MRC scheme in tax year 2018/19</span>
+        <span class="n">Scheme</span><span class="o">.</span><span class="n">MRC</span><span class="p">:</span> <span class="n">_cost_calculator</span><span class="p">(</span>
+            <span class="n">tax_year</span><span class="o">=</span><span class="mi">2018</span><span class="p">,</span>
+            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">mrc_employer_contribution</span><span class="p">,</span>
             <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
         <span class="p">),</span>
     <span class="p">},</span>
