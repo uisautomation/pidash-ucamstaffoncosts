@@ -39,3 +39,11 @@ def nhs_employer_contribution(base_salary):
 
     """
     return base_salary * rates.NHS_EMPLOYER_RATE
+
+
+def mrc_employer_contribution(base_salary):
+    """
+    Return the MRC employer contribution.
+
+    """
+    return base_salary * rates.MRC_EMPLOYER_RATE

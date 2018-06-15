@@ -29,3 +29,8 @@ CPS_HYBRID_EMPLOYER_RATE = fractions.Fraction(237, 1000)  # 23.7%
 #: as an un-dated constant. Taken from NHS website at:
 #: http://www.nhsemployers.org/your-workforce/pay-and-reward/pensions/pension-contribution-tax-relief  # noqa: E501
 NHS_EMPLOYER_RATE = fractions.Fraction(1438, 10000)  # 14.38%
+
+#: Rate or MRC employer contribution. This is not expected to change every tax year so it is added
+#: as an un-dated constant. Taken from
+#: https://mrc.ukri.org/about/our-structure/council/mrc-legacy-council/meeting-dates-agendas-minutes/december-2017-council-business-meeting-minutes-pdf/  # noqa: E501
+MRC_EMPLOYER_RATE = fractions.Fraction(159, 1000)  # 15.9%

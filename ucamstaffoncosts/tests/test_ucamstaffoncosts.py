@@ -75,6 +75,15 @@ def test_nhs_2018():
         'nhs_2018.csv', with_exchange_column=True)
 
 
+def test_mrc_2018():
+    """Check on-costs are returned for MRC."""
+    # We have no ground truth for MRC unfortunately so we check that NotImplementedError is not
+    # raised and a result is returned.
+    result = costs.calculate_cost(40000, costs.Scheme.MRC, 2018)
+    nose.tools.assert_equal(result.salary, 40000)
+    nose.tools.assert_greater(result.total, result.salary)
+
+
 def test_default_scheme():
     """Check on-costs for default scheme and year"""
     with mock.patch('ucamstaffoncosts.costs._LATEST_TAX_YEAR', 2018):
