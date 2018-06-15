@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
@@ -140,238 +139,197 @@
            <div itemprop="articleBody">
             
   <h1>Source code for ucamstaffoncosts</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">enum</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. testsetup::</span>
+
+<span class="sd">    from ucamstaffoncosts import *</span>
+<span class="sd">    import datetime</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">fractions</span>
-<span class="kn">import</span> <span class="nn">math</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">tax</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">pension</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">costs</span>
 
-<span class="n">_OnCost</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
-    <span class="s1">&#39;OnCost&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;salary exchange employer_pension employer_nic apprenticeship_levy total&#39;</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.costs</span> <span class="k">import</span> <span class="n">Scheme</span><span class="p">,</span> <span class="n">Cost</span>
+<span class="kn">from</span> <span class="nn">.salary.progression</span> <span class="k">import</span> <span class="n">SalaryRecord</span>
+<span class="kn">from</span> <span class="nn">.salary.scales</span> <span class="k">import</span> <span class="n">Grade</span>
 
 
-<div class="viewcode-block" id="OnCost"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.OnCost">[docs]</a><span class="k">class</span> <span class="nc">OnCost</span><span class="p">(</span><span class="n">_OnCost</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;An individual on-costs calculation for a gross salary.</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;employment_expenditure_and_commitments&#39;</span><span class="p">,</span> <span class="s1">&#39;CommitmentExplanation&#39;</span><span class="p">,</span> <span class="s1">&#39;Scheme&#39;</span><span class="p">,</span> <span class="s1">&#39;Grade&#39;</span><span class="p">,</span> <span class="s1">&#39;Cost&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SalaryRecord&#39;</span>
+<span class="p">]</span>
 
-<span class="sd">    .. note::</span>
 
-<span class="sd">        These values are all rounded to the nearest pound and so total may not be the sum of all</span>
-<span class="sd">        the other fields.</span>
+<div class="viewcode-block" id="employment_expenditure_and_commitments"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.employment_expenditure_and_commitments">[docs]</a><span class="k">def</span> <span class="nf">employment_expenditure_and_commitments</span><span class="p">(</span><span class="n">until_date</span><span class="p">,</span> <span class="n">initial_grade</span><span class="p">,</span> <span class="n">initial_point</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span>
+                                           <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">from_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                           <span class="n">tax_year_start_month</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">tax_year_start_day</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the existing expenditure and remaining commitments for an employee&#39;s contract.</span>
+<span class="sd">    Returns a pair giving the total commitment and a list of :py:class:`CommitmentExplanation`</span>
+<span class="sd">    tuples explaining the calculation.</span>
+
+<span class="sd">    :param from_date: date at which to differentiate between expenditure and commitments. If</span>
+<span class="sd">        ``None``, today&#39;s date is used.</span>
+<span class="sd">    :param start_date: date at which employee started. Results will be returned from this date. If</span>
+<span class="sd">        ``None``, the &quot;from date&quot; is used.</span>
+<span class="sd">    :param occupancy: proportion of full-time this employee works</span>
+<span class="sd">    :type occupancy: :py:class:`numbers.Rational`</span>
+
+<span class="sd">    Remaining keyword arguments are passed to :py:func:`costs_by_tax_year`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts import Grade, Scheme</span>
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES</span>
+<span class="sd">    &gt;&gt;&gt; initial_grade = Grade.GRADE_2</span>
+<span class="sd">    &gt;&gt;&gt; initial_point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(initial_grade)</span>
+<span class="sd">    &gt;&gt;&gt; scheme = Scheme.USS_EXCHANGE</span>
+<span class="sd">    &gt;&gt;&gt; next_anniversary_date = datetime.date(2016, 6, 1)</span>
+<span class="sd">    &gt;&gt;&gt; from_date = next_anniversary_date - datetime.timedelta(days=400)</span>
+<span class="sd">    &gt;&gt;&gt; until_date = from_date + datetime.timedelta(days=1000)</span>
+
+<span class="sd">    &gt;&gt;&gt; expenditure, commitments, _ = employment_expenditure_and_commitments(</span>
+<span class="sd">    ...     until_date, initial_grade, initial_point, scheme,</span>
+<span class="sd">    ...     from_date=from_date, next_anniversary_date=next_anniversary_date,</span>
+<span class="sd">    ...     scale_table=EXAMPLE_SALARY_SCALES)</span>
+<span class="sd">    &gt;&gt;&gt; expenditure</span>
+<span class="sd">    0</span>
+<span class="sd">    &gt;&gt;&gt; commitments</span>
+<span class="sd">    50146</span>
+
+<span class="sd">    The *occupancy* parameter allows one to specify what proportion of full time this person works:</span>
+
+<span class="sd">    &gt;&gt;&gt; import fractions</span>
+<span class="sd">    &gt;&gt;&gt; _, half_time_commitments, _ = employment_expenditure_and_commitments(</span>
+<span class="sd">    ...     until_date, initial_grade, initial_point, scheme,</span>
+<span class="sd">    ...     occupancy=fractions.Fraction(50, 100),</span>
+<span class="sd">    ...     from_date=from_date, next_anniversary_date=next_anniversary_date,</span>
+<span class="sd">    ...     scale_table=EXAMPLE_SALARY_SCALES)</span>
+<span class="sd">    &gt;&gt;&gt; half_time_commitments</span>
+<span class="sd">    24221</span>
+
+<span class="sd">    Notice that this value is not half of the full-time commitments since employer costs do not</span>
+<span class="sd">    scale linearly!</span>
+
+<span class="sd">    The first tax year returned will contain the *from_date*:</span>
+
+<span class="sd">    &gt;&gt;&gt; from_date = datetime.date(2016, 1, 1)</span>
+<span class="sd">    &gt;&gt;&gt; _, _, explanations = employment_expenditure_and_commitments(</span>
+<span class="sd">    ...     until_date, initial_grade, initial_point, scheme,</span>
+<span class="sd">    ...     from_date=from_date, next_anniversary_date=next_anniversary_date,</span>
+<span class="sd">    ...     scale_table=EXAMPLE_SALARY_SCALES)</span>
+<span class="sd">    &gt;&gt;&gt; explanations[0].tax_year</span>
+<span class="sd">    2016</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">occupancy_fraction</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
+
+    <span class="n">from_date</span> <span class="o">=</span> <span class="n">from_date</span> <span class="k">if</span> <span class="n">from_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+    <span class="n">start_date</span> <span class="o">=</span> <span class="n">start_date</span> <span class="k">if</span> <span class="n">start_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">from_date</span>
+
+    <span class="n">start_year</span> <span class="o">=</span> <span class="n">start_date</span><span class="o">.</span><span class="n">year</span>
+    <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">start_year</span><span class="p">,</span> <span class="n">tax_year_start_month</span><span class="p">,</span> <span class="n">tax_year_start_day</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">start_date</span><span class="p">:</span>
+        <span class="n">start_year</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="c1"># Calculate costs</span>
+    <span class="n">all_costs</span> <span class="o">=</span> <span class="n">costs</span><span class="o">.</span><span class="n">costs_by_tax_year</span><span class="p">(</span>
+        <span class="n">start_year</span><span class="p">,</span> <span class="n">initial_grade</span><span class="p">,</span> <span class="n">initial_point</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span>
+        <span class="n">occupancy</span><span class="o">=</span><span class="n">occupancy_fraction</span><span class="p">,</span>
+        <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">tax_year_start_month</span><span class="o">=</span><span class="n">tax_year_start_month</span><span class="p">,</span>
+        <span class="n">tax_year_start_day</span><span class="o">=</span><span class="n">tax_year_start_day</span><span class="p">,</span>
+        <span class="n">until_date</span><span class="o">=</span><span class="n">until_date</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">explanations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">total_expenditure</span><span class="p">,</span> <span class="n">total_commitment</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">salaries</span> <span class="ow">in</span> <span class="n">all_costs</span><span class="p">:</span>
+        <span class="c1"># What range of dates does this cover?</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="n">salaries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">date</span>
+        <span class="n">end_date</span> <span class="o">=</span> <span class="n">salaries</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">date</span>
+
+        <span class="n">tax_year_start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span>
+            <span class="n">year</span><span class="p">,</span> <span class="n">tax_year_start_month</span><span class="p">,</span> <span class="n">tax_year_start_day</span><span class="p">)</span>
+        <span class="n">tax_year_end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span>
+            <span class="n">year</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">tax_year_start_month</span><span class="p">,</span> <span class="n">tax_year_start_day</span><span class="p">)</span>
+        <span class="n">tax_year_days</span> <span class="o">=</span> <span class="p">(</span><span class="n">tax_year_end_date</span> <span class="o">-</span> <span class="n">tax_year_start_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+
+        <span class="c1"># Should never get salary records after until_date</span>
+        <span class="k">assert</span> <span class="n">end_date</span> <span class="o">&lt;=</span> <span class="n">until_date</span>
+
+        <span class="c1"># Compute total earnings earned *after or on* the from_date.</span>
+        <span class="n">earnings_after_from_date</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">salary_start</span><span class="p">,</span> <span class="n">salary_end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">salaries</span><span class="p">,</span> <span class="n">salaries</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">salary_start_date</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">salary_start</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">from_date</span><span class="p">)</span>
+            <span class="n">salary_end_date</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">salary_start_date</span><span class="p">,</span> <span class="n">salary_end</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+
+            <span class="c1"># how many days in this range?</span>
+            <span class="n">days</span> <span class="o">=</span> <span class="p">(</span><span class="n">salary_end_date</span> <span class="o">-</span> <span class="n">salary_start_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+            <span class="n">earnings_after_from_date</span> <span class="o">+=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span>
+                <span class="n">days</span> <span class="o">*</span> <span class="n">salary_start</span><span class="o">.</span><span class="n">base_salary</span><span class="p">,</span> <span class="n">tax_year_days</span><span class="p">)</span> <span class="o">*</span> <span class="n">occupancy_fraction</span>
+        <span class="n">earnings_after_from_date</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">earnings_after_from_date</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">earnings_after_from_date</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="n">earnings_after_from_date</span> <span class="o">&lt;=</span> <span class="n">cost</span><span class="o">.</span><span class="n">salary</span>
+
+        <span class="c1"># commitment is share of total cost weighted by the ratio of earnings after from date to</span>
+        <span class="c1"># total earnings for that year</span>
+        <span class="n">commitment</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">earnings_after_from_date</span><span class="p">,</span> <span class="n">cost</span><span class="o">.</span><span class="n">salary</span><span class="p">)</span> <span class="o">*</span> <span class="n">cost</span><span class="o">.</span><span class="n">total</span><span class="p">)</span>
+        <span class="n">expenditure</span> <span class="o">=</span> <span class="n">cost</span><span class="o">.</span><span class="n">total</span> <span class="o">-</span> <span class="n">commitment</span>
+
+        <span class="n">explanations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CommitmentExplanation</span><span class="p">(</span>
+            <span class="n">tax_year</span><span class="o">=</span><span class="n">start_date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">salary</span><span class="o">=</span><span class="n">cost</span><span class="o">.</span><span class="n">salary</span><span class="p">,</span>
+            <span class="n">salary_to_come</span><span class="o">=</span><span class="n">earnings_after_from_date</span><span class="p">,</span>
+            <span class="n">expenditure</span><span class="o">=</span><span class="n">expenditure</span><span class="p">,</span> <span class="n">commitment</span><span class="o">=</span><span class="n">commitment</span><span class="p">,</span>
+            <span class="n">salaries</span><span class="o">=</span><span class="n">salaries</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="n">cost</span>
+        <span class="p">))</span>
+
+        <span class="n">total_expenditure</span> <span class="o">+=</span> <span class="n">expenditure</span>
+        <span class="n">total_commitment</span> <span class="o">+=</span> <span class="n">commitment</span>
+
+    <span class="k">return</span> <span class="n">total_expenditure</span><span class="p">,</span> <span class="n">total_commitment</span><span class="p">,</span> <span class="n">explanations</span></div>
+
+
+<span class="n">_CommitmentExplanation</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;CommitmentExplanation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tax_year salary salary_to_come expenditure commitment salaries cost&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CommitmentExplanation"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.CommitmentExplanation">[docs]</a><span class="k">class</span> <span class="nc">CommitmentExplanation</span><span class="p">(</span><span class="n">_CommitmentExplanation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An explanation of the commitment calculation for a given tax year.</span>
+
+<span class="sd">    .. py:attribute:: tax_year</span>
+
+<span class="sd">        Integer giving the calendar year when the tax year started</span>
 
 <span class="sd">    .. py:attribute:: salary</span>
 
-<span class="sd">        Gross salary for the employee.</span>
+<span class="sd">        Total base salary for the tax year</span>
 
-<span class="sd">    .. py:attribute:: exchange</span>
+<span class="sd">    .. py:attribute:: salary_to_come</span>
 
-<span class="sd">        Amount of gross salary exchanged as part of a salary exchange pension. By convention, this</span>
-<span class="sd">        value is negative if non-zero.</span>
+<span class="sd">        Salary which is yet to come. I.e. the salary which has not yet been earned as of the &quot;from&quot;</span>
+<span class="sd">        date.</span>
 
-<span class="sd">    .. py:attribute:: employer_pension</span>
+<span class="sd">    .. py:attribute:: expenditure</span>
 
-<span class="sd">        Employer pension contribution including any salary exchange amount.</span>
+<span class="sd">        The expenditure for this tax year. I.e. the amount of total cost of employment which has</span>
+<span class="sd">        already been spent.</span>
 
-<span class="sd">    .. py:attribute:: employer_nic</span>
+<span class="sd">    .. py:attribute:: commitment</span>
 
-<span class="sd">        Employer National Insurance contribution</span>
+<span class="sd">        The commitment for this tax year. This is the total cost of employment minus the</span>
+<span class="sd">        expenditure.</span>
 
-<span class="sd">    .. py:attribute:: apprenticeship_levy</span>
+<span class="sd">    .. py:attribute:: salaries</span>
 
-<span class="sd">        Share of Apprenticeship Levy from this employee</span>
+<span class="sd">        A list of :py:class:`~.SalaryRecord` tuples which</span>
+<span class="sd">        explain why the employee&#39;s salary is what it is during the tax year.</span>
 
-<span class="sd">    .. py:attribute:: total</span>
+<span class="sd">    .. py:attribute:: cost</span>
 
-<span class="sd">        Total on-cost of employing this employee. See note above about situations where this value</span>
-<span class="sd">        may not be the sum of the others.</span>
-
+<span class="sd">        A :py:class:`~.Cost` tuple explaining the total cost of employment for the tax year.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
-
-
-<div class="viewcode-block" id="Scheme"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.Scheme">[docs]</a><span class="k">class</span> <span class="nc">Scheme</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Possible pension schemes an employee can be a member of.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1">#: No pension scheme.</span>
-    <span class="n">NONE</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
-
-    <span class="c1">#: CPS hybrid</span>
-    <span class="n">CPS_HYBRID</span> <span class="o">=</span> <span class="s1">&#39;cps_hybrid&#39;</span>
-
-    <span class="c1">#: CPS hybrid with salary exchange</span>
-    <span class="n">CPS_HYBRID_EXCHANGE</span> <span class="o">=</span> <span class="s1">&#39;cps_hybrid_exchange&#39;</span>
-
-    <span class="c1">#: USS</span>
-    <span class="n">USS</span> <span class="o">=</span> <span class="s1">&#39;uss&#39;</span>
-
-    <span class="c1">#: USS with salary exchange</span>
-    <span class="n">USS_EXCHANGE</span> <span class="o">=</span> <span class="s1">&#39;uss_exchange&#39;</span>
-
-    <span class="c1">#: NHS</span>
-    <span class="n">NHS</span> <span class="o">=</span> <span class="s1">&#39;nhs&#39;</span></div>
-
-
-<span class="c1">#: Special value to pass to :py:func:`~.on_cost` to represent the latest tax year which has an</span>
-<span class="c1">#: implementation.</span>
-<span class="n">LATEST</span> <span class="o">=</span> <span class="s1">&#39;LATEST&#39;</span>
-
-
-<div class="viewcode-block" id="on_cost"><a class="viewcode-back" href="../index.html#ucamstaffoncosts.on_cost">[docs]</a><span class="k">def</span> <span class="nf">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="n">LATEST</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a :py:class:`OnCost` instance given a tax year, pension scheme and gross salary.</span>
-
-<span class="sd">    :param int year: tax year</span>
-<span class="sd">    :param Scheme scheme: pension scheme</span>
-<span class="sd">    :param int gross_salary: gross salary of employee</span>
-
-<span class="sd">    :raises NotImplementedError: if there is not an implementation for the specified tax year and</span>
-<span class="sd">        pension scheme.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">year</span> <span class="o">=</span> <span class="n">_LATEST_TAX_YEAR</span> <span class="k">if</span> <span class="n">year</span> <span class="ow">is</span> <span class="n">LATEST</span> <span class="k">else</span> <span class="n">year</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">calculator</span> <span class="o">=</span> <span class="n">_ON_COST_CALCULATORS</span><span class="p">[</span><span class="n">year</span><span class="p">][</span><span class="n">scheme</span><span class="p">]</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">calculator</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span></div>
-
-
-<span class="k">def</span> <span class="nf">_on_cost_calculator</span><span class="p">(</span><span class="n">employer_nic_cb</span><span class="p">,</span>
-                        <span class="n">employer_pension_cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                        <span class="n">exchange_cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                        <span class="n">apprenticeship_levy_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">standard_apprenticeship_levy</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return a callable which will calculate an OnCost entry from a gross salary. Arguments which are</span>
-<span class="sd">    callables each take a single argument which is a :py:class:`fractions.Fraction` instance</span>
-<span class="sd">    representing the gross salary of the employee. They should return a</span>
-<span class="sd">    :py:class:`fractions.Fraction` instance.</span>
-
-<span class="sd">    :param employer_pension_cb: callable which gives employer pension contribution from gross</span>
-<span class="sd">        salary.</span>
-<span class="sd">    :param employer_nic_cb: callable which gives employer National Insurance contribution from</span>
-<span class="sd">        gross salary.</span>
-<span class="sd">    :param exchange_cb: callable which gives amount of salary sacrificed in a salary exchange</span>
-<span class="sd">        scheme from gross salary.</span>
-<span class="sd">    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from gross</span>
-<span class="sd">        salary.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">on_cost</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">):</span>
-        <span class="c1"># Ensure gross salary is a rational</span>
-        <span class="n">gross_salary</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
-
-        <span class="c1"># We use the convention that the salary exchange value is negative to match the exchange</span>
-        <span class="c1"># column in HR tables.</span>
-        <span class="n">exchange</span> <span class="o">=</span> <span class="o">-</span><span class="n">exchange_cb</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
-
-        <span class="c1"># The employer pension contribution is the contribution based on gross salary along with</span>
-        <span class="c1"># the employee contribution sacrificed from their salary.</span>
-        <span class="n">employer_pension</span> <span class="o">=</span> <span class="n">employer_pension_cb</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span> <span class="o">-</span> <span class="n">exchange</span>
-
-        <span class="c1"># the taxable salary is the gross less the amount sacrificed. HR would appear to round the</span>
-        <span class="c1"># sacrifice first</span>
-        <span class="n">taxable_salary</span> <span class="o">=</span> <span class="n">gross_salary</span> <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">exchange</span><span class="p">)</span>
-
-        <span class="c1"># The employer&#39;s NIC is calculated on the taxable salary.</span>
-        <span class="n">employer_nic</span> <span class="o">=</span> <span class="n">employer_nic_cb</span><span class="p">(</span><span class="n">taxable_salary</span><span class="p">)</span>
-
-        <span class="c1"># The Apprenticeship Levy is calculated on the taxable salary.</span>
-        <span class="n">apprenticeship_levy</span> <span class="o">=</span> <span class="n">apprenticeship_levy_cb</span><span class="p">(</span><span class="n">taxable_salary</span><span class="p">)</span>
-
-        <span class="c1"># The total is calculated using the rounded values.</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">_excel_round</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">exchange</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_pension</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_nic</span><span class="p">)</span>
-            <span class="o">+</span> <span class="n">_excel_round</span><span class="p">(</span><span class="n">apprenticeship_levy</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Round all of the values. Note the odd rounding for exchange. This matters since the</span>
-        <span class="c1"># tables HR generate seem to include -_excel_round(-exchange) even though the total column</span>
-        <span class="c1"># is calculated using _excel_round(exchange). Since Excel always rounds halves up, this</span>
-        <span class="c1"># means that _excel_round(exchange) does not, in general, equal -_excel_round(-exchange) as</span>
-        <span class="c1"># you might expect. Caveat programmer!</span>
-
-        <span class="k">return</span> <span class="n">OnCost</span><span class="p">(</span>
-            <span class="n">salary</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">gross_salary</span><span class="p">),</span>
-            <span class="n">exchange</span><span class="o">=-</span><span class="n">_excel_round</span><span class="p">(</span><span class="o">-</span><span class="n">exchange</span><span class="p">),</span>
-            <span class="n">employer_pension</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_pension</span><span class="p">),</span>
-            <span class="n">employer_nic</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">employer_nic</span><span class="p">),</span>
-            <span class="n">apprenticeship_levy</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">apprenticeship_levy</span><span class="p">),</span>
-            <span class="n">total</span><span class="o">=</span><span class="n">_excel_round</span><span class="p">(</span><span class="n">total</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">on_cost</span>
-
-
-<span class="k">def</span> <span class="nf">_excel_round</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A version of round() which applies the Excel rule that halves rounds *up* rather than the</span>
-<span class="sd">    conventional wisdom that they round to the nearest even.</span>
-
-<span class="sd">    (The jury is out about whether Excel really rounds away from zero or up but rounding up matches</span>
-<span class="sd">    the tables produced by HR.)</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Ensure input is a rational</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">denominator</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="c1"># always round up halves</span>
-        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-
-
-<span class="c1">#: On cost calculators keyed initially by year and then by scheme identifier.</span>
-<span class="n">_ON_COST_CALCULATORS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">2018</span><span class="p">:</span> <span class="p">{</span>
-        <span class="c1"># An employee with no scheme in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">NONE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-
-        <span class="c1"># An employee with USS in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employer_contribution</span><span class="p">,</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-
-        <span class="c1"># An employee with USS and salary exchange in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">USS_EXCHANGE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employer_contribution</span><span class="p">,</span>
-            <span class="n">exchange_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">uss_employee_contribution</span><span class="p">,</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-
-        <span class="c1"># An employee with CPS in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">CPS_HYBRID</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employer_contribution</span><span class="p">,</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-
-        <span class="c1"># An employee with CPS and salary exchange in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">CPS_HYBRID_EXCHANGE</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employer_contribution</span><span class="p">,</span>
-            <span class="n">exchange_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">cps_hybrid_employee_contribution</span><span class="p">,</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-
-        <span class="c1"># An employee on the NHS scheme in tax year 2018/19</span>
-        <span class="n">Scheme</span><span class="o">.</span><span class="n">NHS</span><span class="p">:</span> <span class="n">_on_cost_calculator</span><span class="p">(</span>
-            <span class="n">employer_pension_cb</span><span class="o">=</span><span class="n">pension</span><span class="o">.</span><span class="n">nhs_employer_contribution</span><span class="p">,</span>
-            <span class="n">employer_nic_cb</span><span class="o">=</span><span class="n">tax</span><span class="o">.</span><span class="n">TABLE_A_EMPLOYER_NIC</span><span class="p">[</span><span class="mi">2018</span><span class="p">],</span>
-        <span class="p">),</span>
-    <span class="p">},</span>
-<span class="p">}</span>
-
-<span class="n">_LATEST_TAX_YEAR</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_ON_COST_CALCULATORS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 </pre></div>
 
            </div>
@@ -420,10 +378,7 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

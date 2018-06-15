@@ -1,0 +1,935 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ucamstaffoncosts.salary.progression &mdash; University of Cambridge Staff On-costs  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> University of Cambridge Staff On-costs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">University of Cambridge Staff On-costs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../ucamstaffoncosts.html">ucamstaffoncosts</a> &raquo;</li>
+        
+      <li>ucamstaffoncosts.salary.progression</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ucamstaffoncosts.salary.progression</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Modelling salary progression</span>
+<span class="sd">============================</span>
+
+<span class="sd">The :py:mod:`.progression` module provides tool to model an employee&#39;s salary change over time</span>
+<span class="sd">given a grade, point and date to start modelling from. (We call this the &quot;from date&quot; in this</span>
+<span class="sd">documentation.)</span>
+
+<span class="sd">.. testsetup::</span>
+
+<span class="sd">    from ucamstaffoncosts.salary.progression import *</span>
+<span class="sd">    import datetime</span>
+
+<span class="sd">In our example, we&#39;ll start modelling an employee&#39;s salary from the 1st January 2016.</span>
+
+<span class="sd">&gt;&gt;&gt; from_date = datetime.date(2016, 1, 1)</span>
+
+<span class="sd">To illustrate the use of the module, we&#39;ll make use of the example salary scale table from the</span>
+<span class="sd">:py:mod:`~ucamstaffoncosts.salary.scales` module documentation. When we start modelling, the</span>
+<span class="sd">employee is on the lowest point of grade 2:</span>
+
+<span class="sd">&gt;&gt;&gt; from ucamstaffoncosts import Grade</span>
+<span class="sd">&gt;&gt;&gt; from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES</span>
+<span class="sd">&gt;&gt;&gt; initial_grade = Grade.GRADE_2</span>
+<span class="sd">&gt;&gt;&gt; initial_point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(initial_grade)</span>
+
+<span class="sd">Their next employment anniversary is the 1st June 2016:</span>
+
+<span class="sd">&gt;&gt;&gt; next_anniversary_date = datetime.date(2016, 6, 1)</span>
+
+<span class="sd">We want to show their salary progression up until the 1st January 2023:</span>
+
+<span class="sd">&gt;&gt;&gt; until_date = datetime.date(2023, 1, 1)</span>
+
+<span class="sd">The :py:func:`salary_progression` function will return an iterable given these parameters which</span>
+<span class="sd">will represent the expected salary progression:</span>
+
+<span class="sd">&gt;&gt;&gt; progression = salary_progression(</span>
+<span class="sd">...     from_date, initial_grade, initial_point, next_anniversary_date=next_anniversary_date,</span>
+<span class="sd">...     until_date=until_date, scale_table=EXAMPLE_SALARY_SCALES)</span>
+
+<span class="sd">The iterable returned from :py:func:`salary_progression` yields :py:class:`~SalaryRecord` tuples.</span>
+<span class="sd">We&#39;ll use a format string to nicely present the progression in a table:</span>
+
+<span class="sd">&gt;&gt;&gt; fmt_str = (&#39;{date!s: &lt;12} | {reason: &lt;35} | {grade!s: &lt;16} | {point!s: &lt;5} | &#39;</span>
+<span class="sd">...            &#39;{base_salary: &gt;8,d}&#39;)</span>
+<span class="sd">&gt;&gt;&gt; for row in progression:</span>
+<span class="sd">...     print(fmt_str.format(**row._asdict()))</span>
+<span class="sd">2016-01-01   | set salary                          | Grade.GRADE_2    | P3    |   14,539</span>
+<span class="sd">2016-06-01   | anniversary: point P3 to P4         | Grade.GRADE_2    | P4    |   14,818</span>
+<span class="sd">2016-08-01   | new salary table                    | Grade.GRADE_2    | P4    |   15,052</span>
+<span class="sd">2017-06-01   | anniversary: point P4 to P5         | Grade.GRADE_2    | P5    |   15,356</span>
+<span class="sd">2017-08-01   | new salary table                    | Grade.GRADE_2    | P5    |   15,721</span>
+<span class="sd">2018-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,035</span>
+<span class="sd">2019-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,356</span>
+<span class="sd">2020-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,683</span>
+<span class="sd">2021-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   17,017</span>
+<span class="sd">2022-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   17,357</span>
+
+<span class="sd">The 1st August salary changes are approximated if the mapping table is not known. In this example,</span>
+<span class="sd">the actual tables for 2016 and 2017 were used but approximations were used for the remaining</span>
+<span class="sd">tables. Note that once the maximum anniversary increment point has been reached, no new increments</span>
+<span class="sd">are made on the employment anniversary.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">fractions</span>
+<span class="kn">import</span> <span class="nn">heapq</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">scales</span>
+
+
+<span class="n">_SalaryRecord</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;SalaryRecord&#39;</span><span class="p">,</span> <span class="s1">&#39;date reason grade point base_salary mapping_table_date&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SalaryRecord"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryRecord">[docs]</a><span class="k">class</span> <span class="nc">SalaryRecord</span><span class="p">(</span><span class="n">_SalaryRecord</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A :py:class:`collections.namedtuple` subclass which represents a salary history record.</span>
+
+<span class="sd">    .. py:attribute:: date</span>
+
+<span class="sd">        :py:class:`datetime.date` at which this new salary takes effect.</span>
+
+<span class="sd">    .. py:attribute:: reason</span>
+
+<span class="sd">        Human-readable string describing the reason for this change</span>
+
+<span class="sd">    .. py:attribute:: grade</span>
+
+<span class="sd">        :py:class:`~ucamstaffoncosts.Grade` representing the initial grade of the employee</span>
+
+<span class="sd">    .. py:attribute:: point</span>
+
+<span class="sd">        string giving the name of this employee&#39;s spine point</span>
+
+<span class="sd">    .. py:attribute:: base_salary</span>
+
+<span class="sd">        base salary of the employee in pounds sterling</span>
+
+<span class="sd">    .. py:attribute:: mapping_table_date</span>
+
+<span class="sd">        :py:class:`datetime.date` giving the &quot;effective from&quot; date for the grade and point to base</span>
+<span class="sd">        salary mapping table used</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="salary_progression"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.salary_progression">[docs]</a><span class="k">def</span> <span class="nf">salary_progression</span><span class="p">(</span><span class="n">from_date</span><span class="p">,</span> <span class="n">initial_grade</span><span class="p">,</span> <span class="n">initial_point</span><span class="p">,</span> <span class="n">initial_reason</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">next_anniversary_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">until_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">scale_table</span><span class="o">=</span><span class="n">scales</span><span class="o">.</span><span class="n">SALARY_SCALES</span><span class="p">,</span>
+                       <span class="n">approximate_negotiated_annual_change</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">negotiated_annual_change_month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">negotiated_annual_change_day</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">elide_null_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an iterable of :py:class:`~SalaryRecord` tuples describing the salary</span>
+<span class="sd">    progression of an employee.</span>
+
+<span class="sd">    :param from_date: start returning results from this date</span>
+<span class="sd">    :type from_date: :py:class:`datetime.date`</span>
+<span class="sd">    :param initial_grade: initial grade for employee</span>
+<span class="sd">    :type initial_grade: :py:class:`~ucamstaffoncosts.Grade`</span>
+<span class="sd">    :param initial_point: initial spine point for employee</span>
+<span class="sd">    :type initial_point: str</span>
+<span class="sd">    :param initial_reason: reason passed to :py:func:`set_salary`</span>
+<span class="sd">    :param next_anniversary_date: next anniversary increment date or ``None`` if there is none</span>
+<span class="sd">    :type next_anniversary_date: :py:class:`datetime.date`</span>
+<span class="sd">    :param until_date: it not ``None``, stop returning results on or after this date</span>
+<span class="sd">    :type until_date: :py:class:`datetime.date`</span>
+<span class="sd">    :param scale_table: salary scale table to use</span>
+<span class="sd">    :type scale_table: :py:class:`~ucamstaffoncosts.scales.SalaryScaleTable`</span>
+<span class="sd">    :param approximate_negotiated_annual_change: passed to :py:func:`salary_mapping_tables`</span>
+<span class="sd">    :param negotiated_annual_change_month: passed to :py:func:`salary_mapping_tables`</span>
+<span class="sd">    :param negotiated_annual_change_day: passed to :py:func:`salary_mapping_tables`</span>
+<span class="sd">    :param elide_null_changes: passed to :py:func:`fold`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">changes</span> <span class="o">=</span> <span class="p">[</span><span class="n">set_salary</span><span class="p">(</span>
+        <span class="n">from_date</span><span class="p">,</span> <span class="n">grade</span><span class="o">=</span><span class="n">initial_grade</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="n">initial_point</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">initial_reason</span>
+    <span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">next_anniversary_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">anniversary_increments</span><span class="p">(</span><span class="n">next_anniversary_date</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">scale_table</span><span class="p">))</span>
+
+    <span class="n">progression_iterable</span> <span class="o">=</span> <span class="n">map_grade_and_points</span><span class="p">(</span>
+        <span class="n">compose_changes</span><span class="p">(</span><span class="o">*</span><span class="n">changes</span><span class="p">),</span>
+        <span class="n">salary_mapping_tables_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;table&#39;</span><span class="p">:</span> <span class="n">scale_table</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">until_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">progression_iterable</span> <span class="o">=</span> <span class="n">until</span><span class="p">(</span><span class="n">until_date</span><span class="p">,</span> <span class="n">progression_iterable</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fold</span><span class="p">(</span><span class="n">progression_iterable</span><span class="p">,</span> <span class="n">elide_null_changes</span><span class="o">=</span><span class="n">elide_null_changes</span><span class="p">)</span></div>
+
+
+<span class="n">_Salary</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Salary&#39;</span><span class="p">,</span> <span class="s1">&#39;grade point base_per_annum as_of_date&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Salary"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.Salary">[docs]</a><span class="k">class</span> <span class="nc">Salary</span><span class="p">(</span><span class="n">_Salary</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A :py:class:`collections.namedtuple` subclass which represents a salary for an employee. The</span>
+<span class="sd">    :py:attr:`.grade` and :py:attr:`.point` attributes must be set to represent a salary whereas</span>
+<span class="sd">    the :py:attr:`base_per_annum` may be `None` if this object does not represent a particular</span>
+<span class="sd">    per-annum base salary for that grade and point.</span>
+
+<span class="sd">    The :py:attr:`base_per_annum` and :py:attr:`as_of_date` attributes are optional and will</span>
+<span class="sd">    default to `None`:</span>
+
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import Grade</span>
+<span class="sd">    &gt;&gt;&gt; import datetime</span>
+<span class="sd">    &gt;&gt;&gt; Salary(Grade.GRADE_2, &#39;POINT_X&#39;)</span>
+<span class="sd">    Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=None, as_of_date=None)</span>
+<span class="sd">    &gt;&gt;&gt; Salary(Grade.GRADE_2, &#39;POINT_X&#39;, 10000,</span>
+<span class="sd">    ...        datetime.date(2017, 8, 1)) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=10000,</span>
+<span class="sd">           as_of_date=datetime.date(2017, 8, 1))</span>
+
+<span class="sd">    .. py:attribute:: grade</span>
+
+<span class="sd">        A :py:class:`~ucamstaffoncosts.Grade` representing the grade of the employee.</span>
+
+<span class="sd">    .. py:attribute:: point</span>
+
+<span class="sd">        A string giving the name of the salary spine point within the grade of the employee.</span>
+
+<span class="sd">    .. py:attribute:: base_per_annum</span>
+
+<span class="sd">        If this salary has been converted to a per annum base salary, this is the per annum salary</span>
+<span class="sd">        in pounds sterling. Otherwise, it is `None`.</span>
+
+<span class="sd">    .. py:attribute:: as_of_date</span>
+
+<span class="sd">        If this salary has been converted to a per annum base salary, this is the effective date of</span>
+<span class="sd">        the mapping table used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">base_per_annum</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_of_date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">base_per_annum</span><span class="p">,</span> <span class="n">as_of_date</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Salary.with_base"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.Salary.with_base">[docs]</a>    <span class="k">def</span> <span class="nf">with_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_per_annum</span><span class="p">,</span> <span class="n">as_of_date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a copy of this salary with the :py:attr:`base_per_annum` and :py:attr:`as_of_date`</span>
+<span class="sd">        modified.</span>
+
+<span class="sd">        &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import Grade</span>
+<span class="sd">        &gt;&gt;&gt; import datetime</span>
+<span class="sd">        &gt;&gt;&gt; s1 = Salary(Grade.GRADE_2, &#39;POINT_X&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; s1</span>
+<span class="sd">        Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=None, as_of_date=None)</span>
+<span class="sd">        &gt;&gt;&gt; s2 = s1.with_base(10000, datetime.date(2017, 8, 1))</span>
+<span class="sd">        &gt;&gt;&gt; s2 # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=10000,</span>
+<span class="sd">               as_of_date=datetime.date(2017, 8, 1))</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Salary</span><span class="p">(</span><span class="n">grade</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">point</span><span class="p">,</span> <span class="n">base_per_annum</span><span class="o">=</span><span class="n">base_per_annum</span><span class="p">,</span>
+                      <span class="n">as_of_date</span><span class="o">=</span><span class="n">as_of_date</span><span class="p">)</span></div></div>
+
+
+<span class="n">_SalaryChange</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;SalaryChange&#39;</span><span class="p">,</span> <span class="s1">&#39;date update_salary&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SalaryChange"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryChange">[docs]</a><span class="k">class</span> <span class="nc">SalaryChange</span><span class="p">(</span><span class="n">_SalaryChange</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A :py:class:`collections.namedtuple` subclass which represents a change of salary for an</span>
+<span class="sd">    employee on a particular date.</span>
+
+<span class="sd">    .. py:attribute:: date</span>
+
+<span class="sd">        A :py:class:`datetime.date` on which the salary change happened.</span>
+
+<span class="sd">    .. py:attribute:: update_salary</span>
+
+<span class="sd">        A callable which takes a :py:class:`Salary` object and returns a (new :py:class:`Salary`,</span>
+<span class="sd">        reason) pair with the updated salary. The reason is a human-readable string describing the</span>
+<span class="sd">        reason for the change.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="fold"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.fold">[docs]</a><span class="k">def</span> <span class="nf">fold</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">initial_salary</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">elide_null_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    We will use the following list of :py:class:`SalaryChange` tuples as examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import Grade</span>
+<span class="sd">    &gt;&gt;&gt; changes = [</span>
+<span class="sd">    ...     SalaryChange(date=datetime.date(2017, 1, 1),</span>
+<span class="sd">    ...                  update_salary=lambda s: (s, &#39;pass through salary&#39;)),</span>
+<span class="sd">    ...     SalaryChange(date=datetime.date(2017, 1, 1),</span>
+<span class="sd">    ...                  update_salary=lambda _: (Salary(grade=Grade.GRADE_1, point=&#39;P1&#39;),</span>
+<span class="sd">    ...                                           &#39;set grade and point&#39;)),</span>
+<span class="sd">    ...     SalaryChange(date=datetime.date(2017, 2, 1),</span>
+<span class="sd">    ...                  update_salary=lambda _: (Salary(grade=Grade.GRADE_1, point=&#39;P1&#39;),</span>
+<span class="sd">    ...                                           &#39;null change&#39;)),</span>
+<span class="sd">    ...     SalaryChange(date=datetime.date(2017, 3, 1),</span>
+<span class="sd">    ...                  update_salary=lambda _: (Salary(grade=Grade.GRADE_1, point=&#39;P2&#39;),</span>
+<span class="sd">    ...                                           &#39;point -&gt; P2&#39;)),</span>
+<span class="sd">    ...     SalaryChange(date=datetime.date(2017, 4, 1),</span>
+<span class="sd">    ...                  update_salary=lambda _: (Salary(grade=Grade.GRADE_2, point=&#39;P2&#39;),</span>
+<span class="sd">    ...                                           &#39;grade -&gt; G2&#39;)),</span>
+<span class="sd">    ... ]</span>
+
+<span class="sd">    If *elide_null_changes* is False, changes which do not change the salary are still reported:</span>
+
+<span class="sd">    &gt;&gt;&gt; fmt_str = &#39;{date!s: &lt;12} | {reason: &lt;20} | {grade!s: &lt;16} | {point!s: &lt;5}&#39;</span>
+<span class="sd">    &gt;&gt;&gt; for row in fold(changes, elide_null_changes=False):</span>
+<span class="sd">    ...     print(fmt_str.format(**row._asdict())) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    2017-01-01   | pass through salary  | None             | None</span>
+<span class="sd">    2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
+<span class="sd">    2017-02-01   | null change          | Grade.GRADE_1    | P1</span>
+<span class="sd">    2017-03-01   | point -&gt; P2          | Grade.GRADE_1    | P2</span>
+<span class="sd">    2017-04-01   | grade -&gt; G2          | Grade.GRADE_2    | P2</span>
+
+<span class="sd">    The default is for *elide_null_changes* to be ``True`` which means that changes which do not</span>
+<span class="sd">    change the salary are swallowed:</span>
+
+<span class="sd">    &gt;&gt;&gt; for row in fold(changes):</span>
+<span class="sd">    ...     print(fmt_str.format(**row._asdict())) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
+<span class="sd">    2017-03-01   | point -&gt; P2          | Grade.GRADE_1    | P2</span>
+<span class="sd">    2017-04-01   | grade -&gt; G2          | Grade.GRADE_2    | P2</span>
+
+<span class="sd">    Note that the default grade and point are ``None``. An initial salary can be set via</span>
+<span class="sd">    *initial_salary*:</span>
+
+<span class="sd">    &gt;&gt;&gt; initial_salary = Salary(grade=Grade.GRADE_2, point=&#39;P5&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; for row in fold(changes, initial_salary=initial_salary, elide_null_changes=False):</span>
+<span class="sd">    ...     print(fmt_str.format(**row._asdict())) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    2017-01-01   | pass through salary  | Grade.GRADE_2    | P5</span>
+<span class="sd">    2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
+<span class="sd">    2017-02-01   | null change          | Grade.GRADE_1    | P1</span>
+<span class="sd">    2017-03-01   | point -&gt; P2          | Grade.GRADE_1    | P2</span>
+<span class="sd">    2017-04-01   | grade -&gt; G2          | Grade.GRADE_2    | P2</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">current_salary</span> <span class="o">=</span> <span class="n">initial_salary</span> <span class="ow">or</span> <span class="n">Salary</span><span class="p">(</span><span class="n">grade</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
+        <span class="n">previous_salary</span> <span class="o">=</span> <span class="n">current_salary</span>
+        <span class="n">current_salary</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">update_salary</span><span class="p">(</span><span class="n">previous_salary</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">elide_null_changes</span> <span class="ow">and</span> <span class="p">(</span><span class="n">current_salary</span> <span class="o">==</span> <span class="n">previous_salary</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">yield</span> <span class="n">SalaryRecord</span><span class="p">(</span>
+            <span class="n">change</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">current_salary</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span> <span class="n">current_salary</span><span class="o">.</span><span class="n">point</span><span class="p">,</span>
+            <span class="n">current_salary</span><span class="o">.</span><span class="n">base_per_annum</span><span class="p">,</span> <span class="n">current_salary</span><span class="o">.</span><span class="n">as_of_date</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="map_grade_and_points"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.map_grade_and_points">[docs]</a><span class="k">def</span> <span class="nf">map_grade_and_points</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">salary_mapping_tables_kwargs</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take an iterable yielding :py:class:`~.SalaryChange` or callable objects and map the grade and</span>
+<span class="sd">    point of each :py:class:`~.Salary` to the base per annum salary.</span>
+
+<span class="sd">    :param changes: iterable yielding salary changes</span>
+<span class="sd">    :param salary_mapping_tables_kwargs: additional kwargs to pass to</span>
+<span class="sd">        :py:func:`salary_mapping_tables`.</span>
+
+<span class="sd">    To illustrate functionality, we&#39;ll make use of the same example table as used in the</span>
+<span class="sd">    :py:mod:`ucamstaffoncosts.salary.scales` documentation.  We can model a Grade 2 employee</span>
+<span class="sd">    starting on the lowest point in the following way:</span>
+
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts import Grade</span>
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES</span>
+<span class="sd">    &gt;&gt;&gt; grade = Grade.GRADE_2</span>
+<span class="sd">    &gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(grade)</span>
+<span class="sd">    &gt;&gt;&gt; start_date = datetime.date(2017, 3, 5) # start date on contract</span>
+<span class="sd">    &gt;&gt;&gt; next_anniversary_date = datetime.date(2017, 6, 1)</span>
+<span class="sd">    &gt;&gt;&gt; increments = anniversary_increments(next_anniversary_date, table=EXAMPLE_SALARY_SCALES)</span>
+<span class="sd">    &gt;&gt;&gt; salaries = map_grade_and_points(compose_changes(</span>
+<span class="sd">    ...     set_salary(start_date, grade, point),</span>
+<span class="sd">    ...     increments</span>
+<span class="sd">    ... ), salary_mapping_tables_kwargs={&#39;table&#39;: EXAMPLE_SALARY_SCALES})</span>
+<span class="sd">    &gt;&gt;&gt; fmt_str = (&#39;{date!s: &lt;12} | {reason: &lt;35} | {grade!s: &lt;16} | {point!s: &lt;5} | &#39;</span>
+<span class="sd">    ...            &#39;{base_salary: &gt;8,d}&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; for row in fold(until(datetime.date(2023, 1, 1), salaries), elide_null_changes=False):</span>
+<span class="sd">    ...     print(fmt_str.format(**row._asdict()))</span>
+<span class="sd">    2017-03-05   | set salary                          | Grade.GRADE_2    | P3    |   14,767</span>
+<span class="sd">    2017-06-01   | anniversary: point P3 to P4         | Grade.GRADE_2    | P4    |   15,052</span>
+<span class="sd">    2017-08-01   | new salary table                    | Grade.GRADE_2    | P4    |   15,417</span>
+<span class="sd">    2018-06-01   | anniversary: point P4 to P5         | Grade.GRADE_2    | P5    |   15,721</span>
+<span class="sd">    2018-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,035</span>
+<span class="sd">    2019-06-01   | anniversary: no increment           | Grade.GRADE_2    | P5    |   16,035</span>
+<span class="sd">    2019-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,356</span>
+<span class="sd">    2020-06-01   | anniversary: no increment           | Grade.GRADE_2    | P5    |   16,356</span>
+<span class="sd">    2020-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   16,683</span>
+<span class="sd">    2021-06-01   | anniversary: no increment           | Grade.GRADE_2    | P5    |   16,683</span>
+<span class="sd">    2021-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   17,017</span>
+<span class="sd">    2022-06-01   | anniversary: no increment           | Grade.GRADE_2    | P5    |   17,017</span>
+<span class="sd">    2022-08-01   | new salary table (approximate)      | Grade.GRADE_2    | P5    |   17,357</span>
+
+<span class="sd">    Passing an empty iterable works as you&#39;d expect:</span>
+
+<span class="sd">    &gt;&gt;&gt; list(map_grade_and_points([]))</span>
+<span class="sd">    []</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">changes</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span>
+
+    <span class="c1"># Peek ahead at the first change. If StopIteration is raised, it is bubbled back up to the</span>
+    <span class="c1"># caller.</span>
+    <span class="n">first_change</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span>
+
+    <span class="c1"># Use this value&#39;s from date to determine when we&#39;re interested in mapping tables</span>
+    <span class="n">from_date</span> <span class="o">=</span> <span class="n">first_change</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mapping_tables</span> <span class="o">=</span> <span class="n">salary_mapping_tables</span><span class="p">(</span><span class="n">from_date</span><span class="p">,</span> <span class="o">**</span><span class="n">salary_mapping_tables_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Use the merge_priority_iterables() function to walk through, updating our mapping table as</span>
+    <span class="c1"># we go. To do this we form a list of iterables as shown in that functions documentation. Each</span>
+    <span class="c1"># iterable returns (date, value) pairs. Since merge_priority_iterables() passes us the index,</span>
+    <span class="c1"># we can use it to differentiate between a new table and a new change.</span>
+    <span class="n">changes_iterable</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="c1"># Map changes into a (date, change) pair suitable for merge_priority_iterables. Note that</span>
+        <span class="c1"># we chain() the first change we peeked at back on the iterable.</span>
+        <span class="p">(</span><span class="n">change</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">change</span><span class="p">)</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">([</span><span class="n">first_change</span><span class="p">],</span> <span class="n">changes</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Note: we have mapping_tables first here because we want to guarantee that we know about a</span>
+    <span class="c1"># change of mapping before any change which may need it on the same day.</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">merge_priority_iterables</span><span class="p">([</span><span class="n">mapping_tables</span><span class="p">,</span> <span class="n">changes_iterable</span><span class="p">])</span>
+
+    <span class="n">current_mapping</span><span class="p">,</span> <span class="n">current_mapping_date</span><span class="p">,</span> <span class="n">current_salary</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+        <span class="n">date</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">event</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># This was a new mapping table</span>
+            <span class="n">current_mapping</span><span class="p">,</span> <span class="n">is_approximate</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">current_mapping_date</span> <span class="o">=</span> <span class="n">date</span>
+
+            <span class="n">reason</span> <span class="o">=</span> <span class="s1">&#39;new salary table&#39;</span>
+            <span class="k">if</span> <span class="n">is_approximate</span><span class="p">:</span>
+                <span class="n">reason</span> <span class="o">+=</span> <span class="s1">&#39; (approximate)&#39;</span>
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">salary_change</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+            <span class="c1"># Update the current salary</span>
+            <span class="n">current_salary</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">salary_change</span><span class="o">.</span><span class="n">update_salary</span><span class="p">(</span><span class="n">current_salary</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;should not be reached&#39;</span>  <span class="c1"># pragma: no cover</span>
+
+        <span class="k">if</span> <span class="n">current_salary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">SalaryChange</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="p">,</span> <span class="n">update_salary</span><span class="o">=</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">current_salary</span><span class="o">.</span><span class="n">with_base</span><span class="p">(</span>
+                        <span class="n">current_mapping</span><span class="p">[</span><span class="n">current_salary</span><span class="o">.</span><span class="n">point</span><span class="p">],</span> <span class="n">current_mapping_date</span>
+                    <span class="p">),</span> <span class="n">reason</span>
+                <span class="p">)</span>
+            <span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="compose_changes"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.compose_changes">[docs]</a><span class="k">def</span> <span class="nf">compose_changes</span><span class="p">(</span><span class="o">*</span><span class="n">change_iterables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compose a several iterables yielding :py:class:`SalaryChange` tuples into a single iterable</span>
+<span class="sd">    which yields the changes in ascending date order.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapped_change_iterables</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">((</span><span class="n">change</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">change</span><span class="p">)</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">iterable</span> <span class="ow">in</span> <span class="n">change_iterables</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">merge_priority_iterables</span><span class="p">(</span><span class="n">mapped_change_iterables</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">change</span></div>
+
+
+<div class="viewcode-block" id="until"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.until">[docs]</a><span class="k">def</span> <span class="nf">until</span><span class="p">(</span><span class="n">end_date</span><span class="p">,</span> <span class="n">changes</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Keep iterating over the salary changes in *changes* until the first date which is greater than</span>
+<span class="sd">    *or equal* to *end_date*.</span>
+
+<span class="sd">    &gt;&gt;&gt; start_date = datetime.date(2018, 6, 1)</span>
+<span class="sd">    &gt;&gt;&gt; end_date = datetime.date(2022, 5, 1)</span>
+<span class="sd">    &gt;&gt;&gt; increments = anniversary_increments(start_date)</span>
+<span class="sd">    &gt;&gt;&gt; for change in until(end_date, increments):</span>
+<span class="sd">    ...     print(change.date)</span>
+<span class="sd">    2018-06-01</span>
+<span class="sd">    2019-06-01</span>
+<span class="sd">    2020-06-01</span>
+<span class="sd">    2021-06-01</span>
+
+<span class="sd">    If *end_date* is not a :py:class:`datetime.date`, a :py:exc:`TypeError` is raised:</span>
+
+<span class="sd">    &gt;&gt;&gt; list(until(&#39;2022-05-01&#39;, anniversary_increments(start_date)))</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">    TypeError: until must be passed a date object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">end_date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;until must be passed a date object&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">date</span> <span class="o">&lt;</span> <span class="n">end_date</span><span class="p">,</span> <span class="n">changes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="anniversary_increments"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.anniversary_increments">[docs]</a><span class="k">def</span> <span class="nf">anniversary_increments</span><span class="p">(</span><span class="n">next_anniversary_date</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">scales</span><span class="o">.</span><span class="n">SALARY_SCALES</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an iterable of :py:class:`SalaryChange` tuples representing the increments which happen</span>
+<span class="sd">    on the anniversary of employment starting from *next_anniversary_date*.</span>
+
+<span class="sd">    &gt;&gt;&gt; increments = anniversary_increments(datetime.date(2017, 5, 1))</span>
+<span class="sd">    &gt;&gt;&gt; next(increments).date</span>
+<span class="sd">    datetime.date(2017, 5, 1)</span>
+<span class="sd">    &gt;&gt;&gt; next(increments).date</span>
+<span class="sd">    datetime.date(2018, 5, 1)</span>
+<span class="sd">    &gt;&gt;&gt; next(increments).date</span>
+<span class="sd">    datetime.date(2019, 5, 1)</span>
+
+<span class="sd">    If *next_anniversary_date* is not a :py:class:`datetime.date`, a :py:exc:`TypeError` is raised:</span>
+
+<span class="sd">    &gt;&gt;&gt; next(anniversary_increments(&#39;2017-05-01&#39;))</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">    TypeError: anniversary_increments must be passed a date object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">next_anniversary_date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;anniversary_increments must be passed a date object&#39;</span><span class="p">)</span>
+
+    <span class="n">month</span><span class="p">,</span> <span class="n">day</span> <span class="o">=</span> <span class="n">next_anniversary_date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">next_anniversary_date</span><span class="o">.</span><span class="n">day</span>
+
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">next_anniversary_date</span><span class="o">.</span><span class="n">year</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">update_salary</span><span class="p">(</span><span class="n">previous_salary</span><span class="p">):</span>
+            <span class="n">grade</span><span class="p">,</span> <span class="n">point</span> <span class="o">=</span> <span class="n">previous_salary</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span> <span class="n">previous_salary</span><span class="o">.</span><span class="n">point</span>
+            <span class="n">new_point</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">new_point</span> <span class="o">==</span> <span class="n">point</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">previous_salary</span><span class="p">,</span> <span class="s1">&#39;anniversary: no increment&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">Salary</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">new_point</span><span class="p">),</span>
+                    <span class="s1">&#39;anniversary: point </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">point</span><span class="p">,</span> <span class="n">new_point</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="n">SalaryChange</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">),</span> <span class="n">update_salary</span><span class="o">=</span><span class="n">update_salary</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_salary"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.set_salary">[docs]</a><span class="k">def</span> <span class="nf">set_salary</span><span class="p">(</span><span class="n">from_date</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an iterable which represents a change in grade and/or point.</span>
+
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts import Grade</span>
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import EXAMPLE_SALARY_SCALES</span>
+<span class="sd">    &gt;&gt;&gt; grade = Grade.GRADE_2</span>
+<span class="sd">    &gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.starting_point_for_grade(grade)</span>
+<span class="sd">    &gt;&gt;&gt; next(set_salary(datetime.date(2017, 1, 1), grade, point)) # doctest: +ELLIPSIS</span>
+<span class="sd">    SalaryChange(date=datetime.date(2017, 1, 1), update_salary=...)</span>
+
+<span class="sd">    If *from_date* is not a :py:class:`datetime.date`, a :py:exc:`TypeError` is raised:</span>
+
+<span class="sd">    &gt;&gt;&gt; set_salary(&#39;2017-01-01&#39;, grade, point)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">    TypeError: set_salary must be passed a date object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">from_date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;set_salary must be passed a date object&#39;</span><span class="p">)</span>
+    <span class="n">salary_and_reason</span> <span class="o">=</span> <span class="p">(</span><span class="n">Salary</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">),</span> <span class="n">reason</span> <span class="k">if</span> <span class="n">reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;set salary&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">iter</span><span class="p">([</span><span class="n">SalaryChange</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="n">from_date</span><span class="p">,</span> <span class="n">update_salary</span><span class="o">=</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">salary_and_reason</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="merge_priority_iterables"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.merge_priority_iterables">[docs]</a><span class="k">def</span> <span class="nf">merge_priority_iterables</span><span class="p">(</span><span class="n">iterables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a priority queue over *iterables* which is itself iterable. Each iterable which forms</span>
+<span class="sd">    part of the queue must return objects of the form (deadline, ...). As the queue is iterated</span>
+<span class="sd">    over, the item with the *smallest* deadline from all of the iterators is selected and</span>
+<span class="sd">    (deadline, index, value) is yielded where &quot;index&quot; is the 0-based index of the iterable which</span>
+<span class="sd">    yielded the value in *iterables*.</span>
+
+<span class="sd">    If two iterables are yielding values with the same deadline at the same time, the one which was</span>
+<span class="sd">    earlier in the *iterables* sequence is yielded first.</span>
+
+<span class="sd">    It is envisaged that all iterables passed to the function will themselves yield values with</span>
+<span class="sd">    monotonically increasing deadline. The implementation does not attempt to enforce this.</span>
+
+<span class="sd">    As an example, use two lists as iterables which specify deadlines in terms of date objects:</span>
+
+<span class="sd">    &gt;&gt;&gt; it0 = [</span>
+<span class="sd">    ...     (datetime.date(2018, 3, 31), &#39;it0_0&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 4, 5), &#39;it0_1&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 6, 1), &#39;it0_2&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 6, 1), &#39;it0_3&#39;)</span>
+<span class="sd">    ... ]</span>
+<span class="sd">    &gt;&gt;&gt; it1 = [</span>
+<span class="sd">    ...     (datetime.date(2018, 1, 1), &#39;it1_0&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 3, 31), &#39;it1_1&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 4, 7), &#39;it1_2&#39;),</span>
+<span class="sd">    ...     (datetime.date(2018, 6, 2), &#39;it1_3&#39;)</span>
+<span class="sd">    ... ]</span>
+<span class="sd">    &gt;&gt;&gt; q = merge_priority_iterables([it0, it1])</span>
+<span class="sd">    &gt;&gt;&gt; list(q)  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    [(datetime.date(2018, 1, 1), 1, &#39;it1_0&#39;), (datetime.date(2018, 3, 31), 0, &#39;it0_0&#39;),</span>
+<span class="sd">    (datetime.date(2018, 3, 31), 1, &#39;it1_1&#39;), (datetime.date(2018, 4, 5), 0, &#39;it0_1&#39;),</span>
+<span class="sd">    (datetime.date(2018, 4, 7), 1, &#39;it1_2&#39;), (datetime.date(2018, 6, 1), 0, &#39;it0_2&#39;),</span>
+<span class="sd">    (datetime.date(2018, 6, 1), 0, &#39;it0_3&#39;), (datetime.date(2018, 6, 2), 1, &#39;it1_3&#39;)]</span>
+
+<span class="sd">    Infinite iterables are also supported:</span>
+
+<span class="sd">    &gt;&gt;&gt; import itertools</span>
+<span class="sd">    &gt;&gt;&gt; it3 = map(</span>
+<span class="sd">    ...     lambda o: (datetime.date(2018, 1, 1) + datetime.timedelta(days=30*o), f&#39;it3_{o}&#39;),</span>
+<span class="sd">    ...     itertools.count()</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; q = merge_priority_iterables([it0, it1, it3])</span>
+<span class="sd">    &gt;&gt;&gt; list(itertools.takewhile(</span>
+<span class="sd">    ...     lambda v: v[0] &lt; datetime.date(2018, 8, 1), q))  # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    [(datetime.date(2018, 1, 1), 1, &#39;it1_0&#39;), (datetime.date(2018, 1, 1), 2, &#39;it3_0&#39;),</span>
+<span class="sd">    (datetime.date(2018, 1, 31), 2, &#39;it3_1&#39;), (datetime.date(2018, 3, 2), 2, &#39;it3_2&#39;),</span>
+<span class="sd">    (datetime.date(2018, 3, 31), 0, &#39;it0_0&#39;), (datetime.date(2018, 3, 31), 1, &#39;it1_1&#39;),</span>
+<span class="sd">    (datetime.date(2018, 4, 1), 2, &#39;it3_3&#39;), (datetime.date(2018, 4, 5), 0, &#39;it0_1&#39;),</span>
+<span class="sd">    (datetime.date(2018, 4, 7), 1, &#39;it1_2&#39;), (datetime.date(2018, 5, 1), 2, &#39;it3_4&#39;),</span>
+<span class="sd">    (datetime.date(2018, 5, 31), 2, &#39;it3_5&#39;), (datetime.date(2018, 6, 1), 0, &#39;it0_2&#39;),</span>
+<span class="sd">    (datetime.date(2018, 6, 1), 0, &#39;it0_3&#39;), (datetime.date(2018, 6, 2), 1, &#39;it1_3&#39;),</span>
+<span class="sd">    (datetime.date(2018, 6, 30), 2, &#39;it3_6&#39;), (datetime.date(2018, 7, 30), 2, &#39;it3_7&#39;)]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The implementation is a thin wrapper around heapq.merge() which nearly does everything we</span>
+    <span class="c1"># need. We modify the iterables&#39; values to be (deadline, iterable index, value) We insert</span>
+    <span class="c1"># &quot;iterable index&quot; here as a tie-break value to ensure that the ordering of values with equal</span>
+    <span class="c1"># deadline is deterministic and follows the documentation above. This also means that the</span>
+    <span class="c1"># values need not be comparable since the tuple comparison will stop at the iterable index.</span>
+    <span class="k">return</span> <span class="n">heapq</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+        <span class="c1"># note: the idx=idx is necessary because lambdas capture by *reference*, not value</span>
+        <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="nb">iter</span><span class="p">(</span><span class="n">it</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterables</span><span class="p">)</span>
+    <span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="salary_mapping_tables"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.salary_mapping_tables">[docs]</a><span class="k">def</span> <span class="nf">salary_mapping_tables</span><span class="p">(</span><span class="n">from_date</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">scales</span><span class="o">.</span><span class="n">SALARY_SCALES</span><span class="p">,</span>
+                          <span class="n">approximate_negotiated_annual_change</span><span class="o">=</span><span class="n">fractions</span><span class="o">.</span><span class="n">Fraction</span><span class="p">(</span><span class="mi">102</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                          <span class="n">negotiated_annual_change_month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">negotiated_annual_change_day</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an iterable which yields (date, mapping, is_approximate) tuples. The date in each tuple</span>
+<span class="sd">    refers to an effective-from date for a point to salary mapping and the mapping is a dict</span>
+<span class="sd">    mapping point names to pounds sterling full-time equivalent salaries. The first date returned</span>
+<span class="sd">    is guaranteed to be before or equal to *from_date*.</span>
+
+<span class="sd">    :param from_date: date from which mappings are required</span>
+<span class="sd">    :type from_date: :py:class:`date.datetime`</span>
+<span class="sd">    :param table: salary scale table to use</span>
+<span class="sd">    :type table: :py:class:`~ucamstaffoncosts.salary.scales.SalaryScaleTable`</span>
+<span class="sd">    :param approximate_negotiated_annual_change: multiplier to use for annual negotiated salary</span>
+<span class="sd">        change for years when a point table is unavailable</span>
+
+<span class="sd">    Where present, actual mapping tables are used. For these tables, *is_approximate* will be</span>
+<span class="sd">    ``False``. For annual negotiated changes where the table is not available, an approximation is</span>
+<span class="sd">    used: the previous year&#39;s salaries are multiplied by *approximate_negotiated_annual_change*.</span>
+<span class="sd">    These approximations are always made relative to the latest actual salaries available even if</span>
+<span class="sd">    one is required to approximate into the past. For these tables, *is_approximate* will be</span>
+<span class="sd">    ``True``.</span>
+
+<span class="sd">    The date at which this change happens is taken from the *latest* actual change recorded in the</span>
+<span class="sd">    salary table. It can be overridden via the *negotiated_annual_change_month* and</span>
+<span class="sd">    *negotiated_annual_change_day* parameters. These parameters are 1-based day and month indices</span>
+<span class="sd">    as accepted by :py:class:`datetime.date`.</span>
+
+<span class="sd">    To illustrate, we will use the example table from the :py:mod:`~ucamstaffoncosts.salary.scales`</span>
+<span class="sd">    module.</span>
+
+<span class="sd">    &gt;&gt;&gt; import pkg_resources</span>
+<span class="sd">    &gt;&gt;&gt; import yaml</span>
+<span class="sd">    &gt;&gt;&gt; from ucamstaffoncosts.salary.scales import SalaryScaleTable</span>
+<span class="sd">    &gt;&gt;&gt; table = SalaryScaleTable(yaml.load(pkg_resources.resource_string(</span>
+<span class="sd">    ...    &#39;ucamstaffoncosts&#39;, &#39;data/example_salary_scales.yaml&#39;)))</span>
+<span class="sd">    &gt;&gt;&gt; from_date = datetime.date(2017, 5, 1)</span>
+<span class="sd">    &gt;&gt;&gt; mappings = salary_mapping_tables(from_date, table=table)</span>
+
+<span class="sd">    The first date returned will be before *from_date* since it is the effective-from date of the</span>
+<span class="sd">    appropriate salary mapping table:</span>
+
+<span class="sd">    &gt;&gt;&gt; date, mapping1, is_approximate = next(mappings)</span>
+<span class="sd">    &gt;&gt;&gt; is_approximate</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; date &lt; from_date</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; date</span>
+<span class="sd">    datetime.date(2016, 8, 1)</span>
+<span class="sd">    &gt;&gt;&gt; _, expected_mapping = table.point_to_salary_map_for_date(date)</span>
+<span class="sd">    &gt;&gt;&gt; mapping1 == expected_mapping</span>
+<span class="sd">    True</span>
+
+<span class="sd">    The mapping returned for the next date will also match the one from the table as the table has</span>
+<span class="sd">    an exact salary map:</span>
+
+<span class="sd">    &gt;&gt;&gt; date, mapping2, is_approximate = next(mappings)</span>
+<span class="sd">    &gt;&gt;&gt; is_approximate</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; date</span>
+<span class="sd">    datetime.date(2017, 8, 1)</span>
+<span class="sd">    &gt;&gt;&gt; mapping1 == mapping2</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; _, expected_mapping = table.point_to_salary_map_for_date(date)</span>
+<span class="sd">    &gt;&gt;&gt; mapping2 == expected_mapping</span>
+<span class="sd">    True</span>
+
+<span class="sd">    However, the third date will be a new approximated mapping which is not present in the original</span>
+<span class="sd">    table:</span>
+
+<span class="sd">    &gt;&gt;&gt; date, mapping3, is_approximate = next(mappings)</span>
+<span class="sd">    &gt;&gt;&gt; is_approximate</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; date</span>
+<span class="sd">    datetime.date(2018, 8, 1)</span>
+<span class="sd">    &gt;&gt;&gt; mapping2 == mapping3</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; _, non_extrapolated_mapping = table.point_to_salary_map_for_date(date)</span>
+<span class="sd">    &gt;&gt;&gt; mapping3 == non_extrapolated_mapping</span>
+<span class="sd">    False</span>
+
+<span class="sd">    This approximation should be a 2% rise over the previous value (although it is rounded to the</span>
+<span class="sd">    nearest integer):</span>
+
+<span class="sd">    &gt;&gt;&gt; mapping2 == {</span>
+<span class="sd">    ...     &#39;P1&#39;: 14304, &#39;P2&#39;: 14675, &#39;P3&#39;: 15126, &#39;P4&#39;: 15417, &#39;P5&#39;: 15721, &#39;P6&#39;: 16035,</span>
+<span class="sd">    ...     &#39;P7&#39;: 16341, &#39;P8&#39;: 16654}</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; [abs((mapping3[k]/v) - 1.02) &lt; 1e-4 for k, v in mapping2.items()]</span>
+<span class="sd">    [True, True, True, True, True, True, True, True]</span>
+
+<span class="sd">    Finally, the fourth date&#39;s mapping should be an approximation which is a further 2% rise:</span>
+
+<span class="sd">    &gt;&gt;&gt; date, mapping4, is_approximate = next(mappings)</span>
+<span class="sd">    &gt;&gt;&gt; is_approximate</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; date</span>
+<span class="sd">    datetime.date(2019, 8, 1)</span>
+<span class="sd">    &gt;&gt;&gt; mapping3 == mapping4</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; [abs((mapping4[k]/v) - 1.02) &lt; 1e-4 for k, v in mapping3.items()]</span>
+<span class="sd">    [True, True, True, True, True, True, True, True]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find the dates for which we have an exact mapping from point to salary.</span>
+    <span class="n">exact_dates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">point_to_salary_map_effective_dates</span><span class="p">())</span>
+
+    <span class="c1"># And the latest date from those</span>
+    <span class="n">latest_exact_date</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">exact_dates</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">latest_exact_mapping</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">point_to_salary_map_for_date</span><span class="p">(</span><span class="n">latest_exact_date</span><span class="p">)</span>
+
+    <span class="c1"># Determine the month and day of increments</span>
+    <span class="n">negotiated_annual_change_month</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">negotiated_annual_change_month</span> <span class="k">if</span> <span class="n">negotiated_annual_change_month</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">latest_exact_date</span><span class="o">.</span><span class="n">month</span>
+    <span class="p">)</span>
+    <span class="n">negotiated_annual_change_day</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">negotiated_annual_change_day</span> <span class="k">if</span> <span class="n">negotiated_annual_change_day</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">latest_exact_date</span><span class="o">.</span><span class="n">day</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Which year should we start from?</span>
+    <span class="n">start_year</span> <span class="o">=</span> <span class="n">from_date</span><span class="o">.</span><span class="n">year</span>
+    <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">start_year</span><span class="p">,</span> <span class="n">negotiated_annual_change_month</span><span class="p">,</span>
+                     <span class="n">negotiated_annual_change_day</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">from_date</span><span class="p">:</span>
+        <span class="n">start_year</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="c1"># Assert the invariant promised in the documentation</span>
+    <span class="k">assert</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">start_year</span><span class="p">,</span> <span class="n">negotiated_annual_change_month</span><span class="p">,</span>
+                         <span class="n">negotiated_annual_change_day</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">from_date</span>
+
+    <span class="c1"># Start iterating over all years</span>
+    <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">start_year</span><span class="p">):</span>
+        <span class="n">change_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">negotiated_annual_change_month</span><span class="p">,</span>
+                                    <span class="n">negotiated_annual_change_day</span><span class="p">)</span>
+
+        <span class="c1"># Is this year one for which we have an exact mapping? If so, use that</span>
+        <span class="k">if</span> <span class="n">change_date</span> <span class="ow">in</span> <span class="n">exact_dates</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">point_to_salary_map_for_date</span><span class="p">(</span><span class="n">change_date</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">change_date</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Otherwise, we need to interpolate. Determine the multiplier for this year:</span>
+        <span class="n">year_delta</span> <span class="o">=</span> <span class="n">year</span> <span class="o">-</span> <span class="n">latest_exact_date</span><span class="o">.</span><span class="n">year</span>
+        <span class="n">multiplier</span> <span class="o">=</span> <span class="n">approximate_negotiated_annual_change</span> <span class="o">**</span> <span class="n">year_delta</span>
+
+        <span class="c1"># Yield an approximate table. Note that we round all approximate salaries.</span>
+        <span class="k">yield</span> <span class="n">change_date</span><span class="p">,</span> <span class="p">{</span>
+            <span class="n">point</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">salary</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">point</span><span class="p">,</span> <span class="n">salary</span> <span class="ow">in</span> <span class="n">latest_exact_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">},</span> <span class="kc">True</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, UIS Automation Team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

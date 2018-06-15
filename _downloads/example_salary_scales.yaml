@@ -1,0 +1,21 @@
+# This is an example salary scales table used for documentation and testing.
+grades:
+- name: GRADE_1
+  scale:
+  - {isContribution: false, name: 'X1', point: P1}
+  - {isContribution: false, name: 'X2', point: P2}
+  - {isContribution: false, name: 'X3', point: P3}
+  - {isContribution: true, name: 'X4', point: P4}
+- name: GRADE_2
+  scale:
+  - {isContribution: false, name: 'Y1', point: P3}
+  - {isContribution: false, name: 'Y2', point: P4}
+  - {isContribution: false, name: 'Y3', point: P5}
+  - {isContribution: true, name: 'Y4', point: P6}
+salaries:
+- effectiveDate: 2016-08-01
+  mapping: {P1: 13965, P2: 14327, P3: 14767,
+    P4: 15052, P5: 15356, P6: 15670, P7: 15976, P8: 16289}
+- effectiveDate: 2017-08-01
+  mapping: {P1: 14304, P2: 14675, P3: 15126,
+    P4: 15417, P5: 15721, P6: 16035, P7: 16341, P8: 16654}

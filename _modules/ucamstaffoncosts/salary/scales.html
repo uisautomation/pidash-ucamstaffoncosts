@@ -1,0 +1,583 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ucamstaffoncosts.salary.scales &mdash; University of Cambridge Staff On-costs  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> University of Cambridge Staff On-costs
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">University of Cambridge Staff On-costs</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../ucamstaffoncosts.html">ucamstaffoncosts</a> &raquo;</li>
+        
+      <li>ucamstaffoncosts.salary.scales</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ucamstaffoncosts.salary.scales</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Salary scales</span>
+<span class="sd">=============</span>
+
+<span class="sd">The :py:mod:`ucamstaffoncosts.salary.scales` module provides a mapping from grade and salary scale</span>
+<span class="sd">point to an annual full-time equivalent salary in pounds sterling. Optionally, this may include a</span>
+<span class="sd">date for which this mapping is required and the salary table will return the result from the latest</span>
+<span class="sd">table which has an effective-from date before or equal to that one.</span>
+
+<span class="sd">In this documentation, we shall use a subset of the full salary table. The YAML source for this</span>
+<span class="sd">table is as follows:</span>
+
+<span class="sd">.. literalinclude:: ../ucamstaffoncosts/data/example_salary_scales.yaml</span>
+
+<span class="sd">.. testsetup::</span>
+
+<span class="sd">    from ucamstaffoncosts.salary.scales import *</span>
+<span class="sd">    import datetime</span>
+<span class="sd">    import yaml</span>
+
+<span class="sd">The table is available via the :py:data:`ucamstaffoncosts.salary.scales.EXAMPLE_SALARY_SCALES`</span>
+<span class="sd">constant:</span>
+
+<span class="sd">&gt;&gt;&gt; isinstance(EXAMPLE_SALARY_SCALES, SalaryScaleTable)</span>
+<span class="sd">True</span>
+
+<span class="sd">For real data, you would want to use the :py:data:`.SALARY_SCALES` constant which is a</span>
+<span class="sd">pre-initialised table using the most recent data available. For all calls which take a table</span>
+<span class="sd">parameter, this table is the default.</span>
+
+<span class="sd">&gt;&gt;&gt; isinstance(SALARY_SCALES, SalaryScaleTable)</span>
+<span class="sd">True</span>
+
+<span class="sd">Using the table, one can find, as an example, the starting salary for grade 2 as of the 1st January</span>
+<span class="sd">2017:</span>
+
+<span class="sd">&gt;&gt;&gt; effective_from_date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(</span>
+<span class="sd">...     datetime.date(2017, 1, 1))</span>
+<span class="sd">&gt;&gt;&gt; effective_from_date</span>
+<span class="sd">datetime.date(2016, 8, 1)</span>
+<span class="sd">&gt;&gt;&gt; mapping[EXAMPLE_SALARY_SCALES.scale_for_grade(Grade.GRADE_2)[0].point]</span>
+<span class="sd">14767</span>
+
+<span class="sd">Or, what their salary will be after their second anniversary:</span>
+
+<span class="sd">&gt;&gt;&gt; grade = Grade.GRADE_2</span>
+<span class="sd">&gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.scale_for_grade(Grade.GRADE_2)[0].point</span>
+<span class="sd">&gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.increment(grade, point) # first anniversary</span>
+<span class="sd">&gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.increment(grade, point) # second anniversary</span>
+<span class="sd">&gt;&gt;&gt; date = datetime.date(2019, 1, 1) # note: two years after start date</span>
+<span class="sd">&gt;&gt;&gt; effective_from_date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(date)</span>
+<span class="sd">&gt;&gt;&gt; effective_from_date</span>
+<span class="sd">datetime.date(2017, 8, 1)</span>
+<span class="sd">&gt;&gt;&gt; second_anniversary_salary = mapping[point]</span>
+<span class="sd">&gt;&gt;&gt; second_anniversary_salary</span>
+<span class="sd">15721</span>
+
+<span class="sd">Note that the salary table is from the 2017 negotiated increment. No attempt is made to predict</span>
+<span class="sd">negotiated increments into the future from this table.</span>
+
+<span class="sd">On the next anniversary, the employee does not proceed to the next spine point since the employee</span>
+<span class="sd">is now at the top non-contribution points for the grade. Hence, the salary will be the same:</span>
+
+<span class="sd">&gt;&gt;&gt; point = EXAMPLE_SALARY_SCALES.increment(grade, point) # third anniversary</span>
+<span class="sd">&gt;&gt;&gt; date = datetime.date(2019, 1, 1) # note: three years after start date</span>
+<span class="sd">&gt;&gt;&gt; effective_from_date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(date)</span>
+<span class="sd">&gt;&gt;&gt; effective_from_date</span>
+<span class="sd">datetime.date(2017, 8, 1)</span>
+<span class="sd">&gt;&gt;&gt; mapping[point] == second_anniversary_salary</span>
+<span class="sd">True</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="Grade"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.Grade">[docs]</a><span class="nd">@enum</span><span class="o">.</span><span class="n">unique</span>
+<span class="k">class</span> <span class="nc">Grade</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Possible grades an employee can be employed at.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: &quot;T&quot; grade</span>
+    <span class="n">T_GRADE</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 1</span>
+    <span class="n">GRADE_1</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 2</span>
+    <span class="n">GRADE_2</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 3</span>
+    <span class="n">GRADE_3</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 4</span>
+    <span class="n">GRADE_4</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 5</span>
+    <span class="n">GRADE_5</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 6</span>
+    <span class="n">GRADE_6</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 7</span>
+    <span class="n">GRADE_7</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 8</span>
+    <span class="n">GRADE_8</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 9</span>
+    <span class="n">GRADE_9</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 10</span>
+    <span class="n">GRADE_10</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 11</span>
+    <span class="n">GRADE_11</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 12 band 1</span>
+    <span class="n">GRADE_12_BAND_1</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 12 band 2</span>
+    <span class="n">GRADE_12_BAND_2</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 12 band 3</span>
+    <span class="n">GRADE_12_BAND_3</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Grade 12 band 4</span>
+    <span class="n">GRADE_12_BAND_4</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SalaryScaleTable"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable">[docs]</a><span class="k">class</span> <span class="nc">SalaryScaleTable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An encapsulation of the `salary scale table</span>
+<span class="sd">    &lt;https://www.hr.admin.cam.ac.uk/pay-benefits/salary-scales&gt;`_ available on the HR website.</span>
+
+<span class="sd">    :param data: a data table whose format is epitomised by the :download:`example</span>
+<span class="sd">        &lt;../ucamstaffoncosts/data/example_salary_scales.yaml&gt;` used in this documentation.</span>
+<span class="sd">    :type data: dict</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_ScaleRow</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ScaleRow&#39;</span><span class="p">,</span> <span class="s1">&#39;name point is_contribution&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SalaryScaleTable.ScaleRow"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.ScaleRow">[docs]</a>    <span class="k">class</span> <span class="nc">ScaleRow</span><span class="p">(</span><span class="n">_ScaleRow</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A :py:class:`collections.namedtuple` subclass which represents a row from the salary scale</span>
+<span class="sd">        for a particular grade.</span>
+
+<span class="sd">        .. py:attribute:: name</span>
+
+<span class="sd">            The name of this point on the salary scale</span>
+
+<span class="sd">        .. py:attribute:: point</span>
+
+<span class="sd">            The name of this point on the spine. This is the name used in the table returned by</span>
+<span class="sd">            :py:meth:`~.point_to_salary_map_for_date`.</span>
+
+<span class="sd">        .. py:attribute:: is_contribution</span>
+
+<span class="sd">            Boolean indicating if this is a contribution point and not subject to annual</span>
+<span class="sd">            increments.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">def</span> <span class="nf">to_row</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SalaryScaleTable</span><span class="o">.</span><span class="n">ScaleRow</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">point</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;point&#39;</span><span class="p">],</span> <span class="n">is_contribution</span><span class="o">=</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;isContribution&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Construct a dictionary mapping Grade values into lists of ScaleRows.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scales_by_grade</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">Grade</span><span class="p">,</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span> <span class="p">[</span><span class="n">to_row</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s1">&#39;grades&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Mappings are sorted by *descending* date</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mappings</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="s1">&#39;salaries&#39;</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;effectiveDate&#39;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SalaryScaleTable.increment"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.increment">[docs]</a>    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the salary scale point which is the next annual increment from the specified grade</span>
+<span class="sd">        and point. If there is no further increment, return the value of *point*. Note that *point*</span>
+<span class="sd">        is the *spine point*, name as used by the table returned by</span>
+<span class="sd">        :py:meth:`~.point_to_salary_map_for_date`.</span>
+
+<span class="sd">        :param grade: grade of employee</span>
+<span class="sd">        :type grade: :py:class:`ucamstaffoncosts.Grade`</span>
+<span class="sd">        :param point: existing spine point for employee</span>
+<span class="sd">        :type point: str</span>
+
+<span class="sd">        Let&#39;s look at the scale for grade 1:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.scale_for_grade(Grade.GRADE_1) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [ScaleRow(name=&#39;X1&#39;, point=&#39;P1&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X2&#39;, point=&#39;P2&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X3&#39;, point=&#39;P3&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X4&#39;, point=&#39;P4&#39;, is_contribution=True)]</span>
+
+<span class="sd">        Normal increments will return the next point:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.increment(Grade.GRADE_1, &#39;P1&#39;)</span>
+<span class="sd">        &#39;P2&#39;</span>
+
+<span class="sd">        Increments do not move to contribution points:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.increment(Grade.GRADE_1, &#39;P3&#39;)</span>
+<span class="sd">        &#39;P3&#39;</span>
+
+<span class="sd">        Contribution points also do not increment:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.increment(Grade.GRADE_1, &#39;P4&#39;)</span>
+<span class="sd">        &#39;P4&#39;</span>
+
+<span class="sd">        Note that the spine point must be in the salary progression for the grade otherwise an</span>
+<span class="sd">        exception is raised:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.increment(Grade.GRADE_1, &#39;P5&#39;)</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">        ValueError: point &quot;P5&quot; is not part of grade &quot;Grade.GRADE_1&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get salary scale for grade</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">grade</span><span class="p">)</span>
+
+        <span class="c1"># Find index of the specified point in the grade</span>
+        <span class="n">index</span><span class="p">,</span> <span class="n">current_row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+            <span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span> <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">point</span> <span class="o">==</span> <span class="n">point</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;point &quot;</span><span class="si">{point!s}</span><span class="s1">&quot; is not part of grade &quot;</span><span class="si">{grade!s}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If this is the last point on the scale, or if this is a contribution point, there is no</span>
+        <span class="c1"># increment</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">current_row</span><span class="o">.</span><span class="n">is_contribution</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">point</span>
+
+        <span class="c1"># Otherwise, find the next row</span>
+        <span class="n">next_row</span> <span class="o">=</span> <span class="n">scale</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># If *this* is a contribution point then the employee does not automatically advance</span>
+        <span class="k">if</span> <span class="n">next_row</span><span class="o">.</span><span class="n">is_contribution</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">point</span>
+
+        <span class="c1"># Otherwise, return the next point</span>
+        <span class="k">return</span> <span class="n">next_row</span><span class="o">.</span><span class="n">point</span></div>
+
+<div class="viewcode-block" id="SalaryScaleTable.scale_for_grade"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.scale_for_grade">[docs]</a>    <span class="k">def</span> <span class="nf">scale_for_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the salary scale for a given grade. The scale is ordered in increasing order of</span>
+<span class="sd">        spine point so that they represent the progression through spine points from annual</span>
+<span class="sd">        increments.</span>
+
+<span class="sd">        :param grade: grade whose scale should be returned</span>
+<span class="sd">        :type grade: :py:class:`ucamstaffoncosts.Grade`</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.scale_for_grade(Grade.GRADE_1) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">        [ScaleRow(name=&#39;X1&#39;, point=&#39;P1&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X2&#39;, point=&#39;P2&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X3&#39;, point=&#39;P3&#39;, is_contribution=False),</span>
+<span class="sd">        ScaleRow(name=&#39;X4&#39;, point=&#39;P4&#39;, is_contribution=True)]</span>
+
+<span class="sd">        Note that the grade *must* be a :py:class:`~ucamstaffoncosts.Grade`:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.scale_for_grade(&#39;GRADE_1&#39;) # doctest: +ELLIPSIS</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">        KeyError: ...</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scales_by_grade</span><span class="p">[</span><span class="n">grade</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SalaryScaleTable.starting_point_for_grade"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.starting_point_for_grade">[docs]</a>    <span class="k">def</span> <span class="nf">starting_point_for_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grade</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convenience wrapper around :py:meth:`~.scale_for_grade` which returns the name of the</span>
+<span class="sd">        first point on the scale for a given grade.</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.starting_point_for_grade(Grade.GRADE_2)</span>
+<span class="sd">        &#39;P3&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">grade</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">point</span></div>
+
+<div class="viewcode-block" id="SalaryScaleTable.point_to_salary_map_effective_dates"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.point_to_salary_map_effective_dates">[docs]</a>    <span class="k">def</span> <span class="nf">point_to_salary_map_effective_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of effective-from dates for each point to salary mapping we know about. These</span>
+<span class="sd">        are ordered in *descending* order of dates.</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.point_to_salary_map_effective_dates()</span>
+<span class="sd">        [datetime.date(2017, 8, 1), datetime.date(2016, 8, 1)]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;effectiveDate&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">mapping</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mappings</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SalaryScaleTable.point_to_salary_map_for_date"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable.point_to_salary_map_for_date">[docs]</a>    <span class="k">def</span> <span class="nf">point_to_salary_map_for_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a salary table mapping for a given date. The mapping table is a dictionary which</span>
+<span class="sd">        maps point names to full-time equivalent salaries. The return value is an (effective date,</span>
+<span class="sd">        table) pair giving the table and the date from which it became effective.</span>
+
+<span class="sd">        :param date: date for which mapping is required. If ``None``, use today&#39;s date</span>
+<span class="sd">        :type date: :py:class:`datetime.date`</span>
+
+<span class="sd">        The exact mapping is selected based upon the date:</span>
+
+<span class="sd">        &gt;&gt;&gt; date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(</span>
+<span class="sd">        ...     datetime.date(2017, 5, 1))</span>
+<span class="sd">        &gt;&gt;&gt; mapping == {</span>
+<span class="sd">        ... &#39;P1&#39;: 13965, &#39;P2&#39;: 14327, &#39;P3&#39;: 14767, &#39;P4&#39;: 15052, &#39;P5&#39;: 15356, &#39;P6&#39;: 15670,</span>
+<span class="sd">        ... &#39;P7&#39;: 15976, &#39;P8&#39;: 16289}</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; date == datetime.date(2016, 8, 1)</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(</span>
+<span class="sd">        ...     datetime.date(2018, 5, 1))</span>
+<span class="sd">        &gt;&gt;&gt; mapping == {</span>
+<span class="sd">        ... &#39;P1&#39;: 14304, &#39;P2&#39;: 14675, &#39;P3&#39;: 15126, &#39;P4&#39;: 15417, &#39;P5&#39;: 15721, &#39;P6&#39;: 16035,</span>
+<span class="sd">        ... &#39;P7&#39;: 16341, &#39;P8&#39;: 16654}</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; date == datetime.date(2017, 8, 1)</span>
+<span class="sd">        True</span>
+
+<span class="sd">        If no date is specified, today&#39;s date is used as a default:</span>
+
+<span class="sd">        &gt;&gt;&gt; d1, m1 = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date()</span>
+<span class="sd">        &gt;&gt;&gt; d2, m2 = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(</span>
+<span class="sd">        ...     datetime.datetime.now().date())</span>
+<span class="sd">        &gt;&gt;&gt; d1 == d2</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; m1 == m2</span>
+<span class="sd">        True</span>
+
+<span class="sd">        If a date matches the effective from date, it returns the corresponding mapping:</span>
+
+<span class="sd">        &gt;&gt;&gt; date, mapping = EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(</span>
+<span class="sd">        ...     datetime.date(2016, 8, 1))</span>
+<span class="sd">        &gt;&gt;&gt; mapping == {</span>
+<span class="sd">        ... &#39;P1&#39;: 13965, &#39;P2&#39;: 14327, &#39;P3&#39;: 14767, &#39;P4&#39;: 15052, &#39;P5&#39;: 15356, &#39;P6&#39;: 15670,</span>
+<span class="sd">        ... &#39;P7&#39;: 15976, &#39;P8&#39;: 16289}</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; date == datetime.date(2016, 8, 1)</span>
+<span class="sd">        True</span>
+
+<span class="sd">        If a date is specified which is too far in the future, a :py:exc:`ValueError` is raised:</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.point_to_salary_map_for_date(datetime.date(2016, 7, 31))</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">        ValueError: date is too far in the past</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+
+        <span class="c1"># Iterate through mapping tables until we find the first table whose effective date is on</span>
+        <span class="c1"># or before the target date. Since the mapping table is sorted by descending date, this</span>
+        <span class="c1"># will be the most recent table for that date. We iterate through in reverse order like</span>
+        <span class="c1"># this so that the common case (give me the most recent one) is efficient.</span>
+        <span class="k">for</span> <span class="n">mapping</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mappings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;effectiveDate&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">date</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;effectiveDate&#39;</span><span class="p">],</span> <span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;mapping&#39;</span><span class="p">]</span>
+
+        <span class="c1"># If no mapping was found, complain.</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;date is too far in the past&#39;</span><span class="p">)</span></div></div>
+
+
+<span class="n">EXAMPLE_SALARY_SCALES</span> <span class="o">=</span> <span class="n">SalaryScaleTable</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_string</span><span class="p">(</span>
+    <span class="s1">&#39;ucamstaffoncosts&#39;</span><span class="p">,</span> <span class="s1">&#39;data/example_salary_scales.yaml&#39;</span><span class="p">)))</span>
+
+
+<span class="n">SALARY_SCALES</span> <span class="o">=</span> <span class="n">SalaryScaleTable</span><span class="p">(</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_string</span><span class="p">(</span><span class="s1">&#39;ucamstaffoncosts&#39;</span><span class="p">,</span> <span class="s1">&#39;data/salary_scales.yaml&#39;</span><span class="p">)))</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, UIS Automation Team.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
