@@ -14,26 +14,6 @@ University HR's website using only the publicly available rates.
 [Documentation](https://uisautomation.github.io/pidash-ucamstaffoncosts/) is
 available on this repository's GitHub pages.
 
-## Example
-
-The functionality of the module is exposed through a single function,
-``on_cost()``, which takes a tax year, pension scheme and gross salary and
-returns an ``OnCost`` object representing the on-costs for that employee:
-
-```python
->>> import ucamstaffoncosts
->>> ucamstaffoncosts.on_cost(gross_salary=25000,
-...                          scheme=ucamstaffoncosts.Scheme.USS, year=2018)
-OnCost(salary=25000, exchange=0, employer_pension=4500,
-       employer_nic=2287, apprenticeship_levy=125, total=31912)
-```
-
-## Future development
-
-This module will be extended to support full expenditure/commitment calculation.
-The method we propose to use is documented in [a JupyterLab
-notebook](doc/salary-calculations.ipynb).
-
 ## Configuring CircleCI
 
 The CircleCI workflow includes automatically building and pushing documentation

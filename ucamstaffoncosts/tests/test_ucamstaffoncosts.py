@@ -6,7 +6,7 @@ import unittest.mock as mock
 
 import nose.tools
 
-import ucamstaffoncosts
+import ucamstaffoncosts.costs as costs
 
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),  'test_data')
@@ -26,60 +26,60 @@ def test_not_implemented_scheme():
 
     with nose.tools.assert_raises(NotImplementedError):
         # Bad year
-        ucamstaffoncosts.on_cost(100, -1000, ucamstaffoncosts.Scheme.USS)
+        costs.calculate_cost(100, -1000, costs.Scheme.USS)
 
     with nose.tools.assert_raises(NotImplementedError):
         # Bad year
-        ucamstaffoncosts.on_cost(100, 2018, 'this-is-not-a-pension-scheme')
+        costs.calculate_cost(100, 2018, 'this-is-not-a-pension-scheme')
 
 
 def test_no_scheme_2018():
     """Check on-costs if employee has no pension scheme."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.NONE, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.NONE, 2018),
         'no_scheme_2018.csv', with_exchange_column=True)
 
 
 def test_uss_2018():
     """Check on-costs if employee has a USS scheme."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.USS, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.USS, 2018),
         'uss_2018.csv')
 
 
 def test_uss_2018_exchange():
     """Check on-costs if employee has a USS scheme with salary exchange."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.USS_EXCHANGE, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.USS_EXCHANGE, 2018),
         'uss_exchange_2018.csv', with_exchange_column=True)
 
 
 def test_cps_hybrid_2018():
     """Check on-costs if employee has a CPS hybrid scheme."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.CPS_HYBRID, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.CPS_HYBRID, 2018),
         'cps_hybrid_2018.csv', with_exchange_column=True)
 
 
 def test_cps_hybrid_2018_exchange():
     """Check on-costs if employee has a CPS hybrid scheme with salary exchange."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.CPS_HYBRID_EXCHANGE, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.CPS_HYBRID_EXCHANGE, 2018),
         'cps_hybrid_exchange_2018.csv', with_exchange_column=True)
 
 
 def test_nhs_2018():
     """Check on-costs if employee has a NHS scheme."""
     assert_generator_matches_table(
-        lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.NHS, 2018),
+        lambda s: costs.calculate_cost(s, costs.Scheme.NHS, 2018),
         'nhs_2018.csv', with_exchange_column=True)
 
 
 def test_default_scheme():
     """Check on-costs for default scheme and year"""
-    with mock.patch('ucamstaffoncosts._LATEST_TAX_YEAR', 2018):
+    with mock.patch('ucamstaffoncosts.costs._LATEST_TAX_YEAR', 2018):
         assert_generator_matches_table(
-            lambda s: ucamstaffoncosts.on_cost(s, ucamstaffoncosts.Scheme.NHS),
+            lambda s: costs.calculate_cost(s, costs.Scheme.NHS),
             'nhs_2018.csv', with_exchange_column=True)
 
 
