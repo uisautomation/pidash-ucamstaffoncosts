@@ -217,6 +217,12 @@ class Scheme(enum.Enum):
     #: MRC
     MRC = enum.auto()
 
+    #: CPS pre-2013
+    CPS_PRE_2013 = enum.auto()
+
+    #: CPS pre-2013 with salary exchange
+    CPS_PRE_2013_EXCHANGE = enum.auto()
+
 
 _Cost = collections.namedtuple(
     'Cost',
@@ -551,6 +557,21 @@ _ON_COST_CALCULATORS = {
         Scheme.MRC: _cost_calculator(
             tax_year=2018,
             employer_pension_cb=pension.mrc_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
+        ),
+
+        # An employee with CPS (pre-2013) in tax year 2018/19
+        Scheme.CPS_PRE_2013: _cost_calculator(
+            tax_year=2018,
+            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
+        ),
+
+        # An employee with CPS (pre-2013) and salary exchange in tax year 2018/19
+        Scheme.CPS_PRE_2013_EXCHANGE: _cost_calculator(
+            tax_year=2018,
+            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
+            exchange_cb=pension.cps_pre_2013_employee_contribution,
             employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
         ),
     },
