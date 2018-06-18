@@ -236,7 +236,7 @@ class SalaryScaleTable:
         'P5'
 
         """
-        # If grade is Nonwe, just return point
+        # If grade is None, just return point
         if grade is None:
             return point
 
