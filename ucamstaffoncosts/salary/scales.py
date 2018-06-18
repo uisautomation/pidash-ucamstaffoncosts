@@ -31,6 +31,12 @@ parameter, this table is the default.
 >>> isinstance(SALARY_SCALES, SalaryScaleTable)
 True
 
+There are various clinical scales which are not represented in this table. For those, you would
+want to use the :py:data:`.CLINICAL_SCALES` constant
+
+>>> isinstance(CLINICAL_SCALES, SalaryScaleTable)
+True
+
 Using the table, one can find, as an example, the starting salary for grade 2 as of the 1st January
 2017:
 
@@ -132,6 +138,15 @@ class Grade(enum.Enum):
 
     #: Grade 12 band 4
     GRADE_12_BAND_4 = enum.auto()
+
+    #: Clinical nodal points
+    CLINICAL_NODAL = enum.auto()
+
+    #: Clinical consultant
+    CLINICAL_CONSULTANT = enum.auto()
+
+    #: Clinical research associate or lecturer
+    CLINICAL_RA_AND_LECTURER = enum.auto()
 
 
 class SalaryScaleTable:
@@ -380,3 +395,6 @@ EXAMPLE_SALARY_SCALES = SalaryScaleTable(yaml.load(pkg_resources.resource_string
 
 SALARY_SCALES = SalaryScaleTable(
     yaml.load(pkg_resources.resource_string('ucamstaffoncosts', 'data/salary_scales.yaml')))
+
+CLINICAL_SCALES = SalaryScaleTable(
+    yaml.load(pkg_resources.resource_string('ucamstaffoncosts', 'data/clinical_scales.yaml')))
