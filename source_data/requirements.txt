@@ -2,3 +2,4 @@ dateparser
 docopt
 openpyxl
 pyyaml
+beautifulsoup4
