@@ -443,6 +443,19 @@ explanations to explain the calculation:</p>
 
 </pre></div>
 </div>
+<p>If <em>initial_grade</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the mapping table will still be used but annual
+increments will not be processed which means that the total expenditure and
+commitments will be lower:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">expenditure</span><span class="p">,</span> <span class="n">commitments</span><span class="p">,</span> <span class="n">explanations</span> <span class="o">=</span> <span class="n">ucamstaffoncosts</span><span class="o">.</span><span class="n">employment_expenditure_and_commitments</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">until_date</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">initial_point</span><span class="p">,</span> <span class="n">scheme</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">from_date</span><span class="o">=</span><span class="n">from_date</span><span class="p">,</span> <span class="n">next_anniversary_date</span><span class="o">=</span><span class="n">next_anniversary_date</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">scale_table</span><span class="o">=</span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">expenditure</span>
+<span class="go">14837</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">commitments</span>
+<span class="go">87258</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="module-ucamstaffoncosts">
 <span id="reference"></span><h2>Reference<a class="headerlink" href="#module-ucamstaffoncosts" title="Permalink to this headline">¶</a></h2>
@@ -1760,6 +1773,11 @@ exception is raised:</p>
 <span class="gt">Traceback (most recent call last):</span>
     <span class="o">...</span>
 <span class="gr">ValueError</span>: <span class="n">point &quot;P5&quot; is not part of grade &quot;Grade.GRADE_1&quot;</span>
+</pre></div>
+</div>
+<p>If the grade is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the “increment” will always return the input grade.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">increment</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;P5&#39;</span><span class="p">)</span>
+<span class="go">&#39;P5&#39;</span>
 </pre></div>
 </div>
 </dd></dl>

@@ -373,7 +373,16 @@
 <span class="sd">            ...</span>
 <span class="sd">        ValueError: point &quot;P5&quot; is not part of grade &quot;Grade.GRADE_1&quot;</span>
 
+<span class="sd">        If the grade is ``None``, the &quot;increment&quot; will always return the input grade.</span>
+
+<span class="sd">        &gt;&gt;&gt; EXAMPLE_SALARY_SCALES.increment(None, &#39;P5&#39;)</span>
+<span class="sd">        &#39;P5&#39;</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If grade is None, just return point</span>
+        <span class="k">if</span> <span class="n">grade</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">point</span>
+
         <span class="c1"># Get salary scale for grade</span>
         <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">grade</span><span class="p">)</span>
 
