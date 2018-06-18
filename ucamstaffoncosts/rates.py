@@ -25,6 +25,16 @@ CPS_HYBRID_EMPLOYEE_RATE = fractions.Fraction(3, 100)  # 3%
 #: FIXME: where does this come from?
 CPS_HYBRID_EMPLOYER_RATE = fractions.Fraction(237, 1000)  # 23.7%
 
+#: Rate of CPS pre-2013 employee contribution. This is not expected to change every tax year so it
+#: is added as an un-dated constant.
+#: FIXME: where does this come from?
+CPS_PRE_2013_EMPLOYEE_RATE = fractions.Fraction(5, 100)  # 5%
+
+#: Rate of CPS pre-2013 employer contribution. This is not expected to change every tax year so it
+#: is added as an un-dated constant.
+#: FIXME: where does this come from?
+CPS_PRE_2013_EMPLOYER_RATE = fractions.Fraction(237, 1000)  # 23.7%
+
 #: Rate of NHS employer contribution. This is not expected to change every tax year so it is added
 #: as an un-dated constant. Taken from NHS website at:
 #: http://www.nhsemployers.org/your-workforce/pay-and-reward/pensions/pension-contribution-tax-relief  # noqa: E501

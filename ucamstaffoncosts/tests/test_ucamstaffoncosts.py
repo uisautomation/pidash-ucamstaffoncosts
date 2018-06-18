@@ -68,6 +68,20 @@ def test_cps_hybrid_2018_exchange():
         'cps_hybrid_exchange_2018.csv', with_exchange_column=True)
 
 
+def test_cps_pre_2013():
+    """Check on-costs if employee has a CPS pre-2013 scheme."""
+    assert_generator_matches_table(
+        lambda s: costs.calculate_cost(s, costs.Scheme.CPS_PRE_2013, 2018),
+        'cps_pre_2013.csv', with_exchange_column=True)
+
+
+def test_cps_pre_2013_exchange():
+    """Check on-costs if employee has a CPS pre-2013 scheme with salary exchange."""
+    assert_generator_matches_table(
+        lambda s: costs.calculate_cost(s, costs.Scheme.CPS_PRE_2013_EXCHANGE, 2018),
+        'cps_exchange_pre_2013.csv', with_exchange_column=True)
+
+
 def test_nhs_2018():
     """Check on-costs if employee has a NHS scheme."""
     assert_generator_matches_table(
