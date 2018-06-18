@@ -1,0 +1,55 @@
+grades:
+- name: CLINICAL_NODAL
+  scale:
+  - {isContribution: true, name: NODE_1, point: NODE_1}
+  - {isContribution: true, name: NODE_2, point: NODE_2}
+  - {isContribution: true, name: NODE_3, point: NODE_3}
+  - {isContribution: true, name: NODE_4, point: NODE_4}
+- name: CLINICAL_CONSULTANT
+  scale:
+  - {isContribution: true, name: CONSULTANT_THRESH_1_YEAR_0, point: CONSULTANT_THRESH_1_YEAR_0}
+  - {isContribution: true, name: CONSULTANT_THRESH_2_YEAR_1, point: CONSULTANT_THRESH_2_YEAR_1}
+  - {isContribution: true, name: CONSULTANT_THRESH_3_YEAR_2, point: CONSULTANT_THRESH_3_YEAR_2}
+  - {isContribution: true, name: CONSULTANT_THRESH_4_YEAR_3, point: CONSULTANT_THRESH_4_YEAR_3}
+  - {isContribution: true, name: CONSULTANT_THRESH_5_YEAR_4, point: CONSULTANT_THRESH_5_YEAR_4}
+  - {isContribution: true, name: CONSULTANT_THRESH_5_YEAR_5, point: CONSULTANT_THRESH_5_YEAR_5}
+  - {isContribution: true, name: CONSULTANT_THRESH_5_YEAR_6, point: CONSULTANT_THRESH_5_YEAR_6}
+  - {isContribution: true, name: CONSULTANT_THRESH_5_YEAR_7, point: CONSULTANT_THRESH_5_YEAR_7}
+  - {isContribution: true, name: CONSULTANT_THRESH_5_YEAR_8, point: CONSULTANT_THRESH_5_YEAR_8}
+  - {isContribution: true, name: CONSULTANT_THRESH_6_YEAR_9, point: CONSULTANT_THRESH_6_YEAR_9}
+  - {isContribution: true, name: CONSULTANT_THRESH_6_YEAR_10, point: CONSULTANT_THRESH_6_YEAR_10}
+  - {isContribution: true, name: CONSULTANT_THRESH_6_YEAR_11, point: CONSULTANT_THRESH_6_YEAR_11}
+  - {isContribution: true, name: CONSULTANT_THRESH_6_YEAR_12, point: CONSULTANT_THRESH_6_YEAR_12}
+  - {isContribution: true, name: CONSULTANT_THRESH_6_YEAR_13, point: CONSULTANT_THRESH_6_YEAR_13}
+  - {isContribution: true, name: CONSULTANT_THRESH_7_YEAR_14, point: CONSULTANT_THRESH_7_YEAR_14}
+  - {isContribution: true, name: CONSULTANT_THRESH_7_YEAR_15, point: CONSULTANT_THRESH_7_YEAR_15}
+  - {isContribution: true, name: CONSULTANT_THRESH_7_YEAR_16, point: CONSULTANT_THRESH_7_YEAR_16}
+  - {isContribution: true, name: CONSULTANT_THRESH_7_YEAR_17, point: CONSULTANT_THRESH_7_YEAR_17}
+  - {isContribution: true, name: CONSULTANT_THRESH_7_YEAR_18, point: CONSULTANT_THRESH_7_YEAR_18}
+  - {isContribution: true, name: CONSULTANT_THRESH_8_YEAR_19, point: CONSULTANT_THRESH_8_YEAR_19}
+- name: CLINICAL_RA_AND_LECTURER
+  scale:
+  - {isContribution: true, name: RA_LECTURER_68, point: RA_LECTURER_68}
+  - {isContribution: true, name: RA_LECTURER_69, point: RA_LECTURER_69}
+  - {isContribution: true, name: RA_LECTURER_70, point: RA_LECTURER_70}
+  - {isContribution: true, name: RA_LECTURER_71, point: RA_LECTURER_71}
+  - {isContribution: true, name: RA_LECTURER_72, point: RA_LECTURER_72}
+  - {isContribution: true, name: RA_LECTURER_73, point: RA_LECTURER_73}
+  - {isContribution: true, name: RA_LECTURER_74, point: RA_LECTURER_74}
+  - {isContribution: true, name: RA_LECTURER_75, point: RA_LECTURER_75}
+  - {isContribution: true, name: RA_LECTURER_76, point: RA_LECTURER_76}
+  - {isContribution: true, name: RA_LECTURER_77, point: RA_LECTURER_77}
+  - {isContribution: true, name: RA_LECTURER_78, point: RA_LECTURER_78}
+salaries:
+- effectiveDate: 2017-04-01
+  mapping: {CONSULTANT_THRESH_1_YEAR_0: 76761, CONSULTANT_THRESH_2_YEAR_1: 79165,
+    CONSULTANT_THRESH_3_YEAR_2: 81568, CONSULTANT_THRESH_4_YEAR_3: 83972, CONSULTANT_THRESH_5_YEAR_4: 86369,
+    CONSULTANT_THRESH_5_YEAR_5: 86369, CONSULTANT_THRESH_5_YEAR_6: 86369, CONSULTANT_THRESH_5_YEAR_7: 86369,
+    CONSULTANT_THRESH_5_YEAR_8: 86369, CONSULTANT_THRESH_6_YEAR_10: 92078, CONSULTANT_THRESH_6_YEAR_11: 92078,
+    CONSULTANT_THRESH_6_YEAR_12: 92078, CONSULTANT_THRESH_6_YEAR_13: 92078, CONSULTANT_THRESH_6_YEAR_9: 92078,
+    CONSULTANT_THRESH_7_YEAR_14: 97787, CONSULTANT_THRESH_7_YEAR_15: 97787, CONSULTANT_THRESH_7_YEAR_16: 97787,
+    CONSULTANT_THRESH_7_YEAR_17: 97787, CONSULTANT_THRESH_7_YEAR_18: 97787, CONSULTANT_THRESH_8_YEAR_19: 103490,
+    NODE_1: 26614, NODE_2: 30805, NODE_3: 36461, NODE_4: 46208, RA_LECTURER_68: 32478,
+    RA_LECTURER_69: 35093, RA_LECTURER_70: 36675, RA_LECTURER_71: 38582, RA_LECTURER_72: 40491,
+    RA_LECTURER_73: 42399, RA_LECTURER_74: 44307, RA_LECTURER_75: 46215, RA_LECTURER_76: 48123,
+    RA_LECTURER_77: 53169, RA_LECTURER_78: 57444}
