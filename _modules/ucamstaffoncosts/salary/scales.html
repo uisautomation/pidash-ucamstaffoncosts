@@ -174,6 +174,12 @@
 <span class="sd">&gt;&gt;&gt; isinstance(SALARY_SCALES, SalaryScaleTable)</span>
 <span class="sd">True</span>
 
+<span class="sd">There are various clinical scales which are not represented in this table. For those, you would</span>
+<span class="sd">want to use the :py:data:`.CLINICAL_SCALES` constant</span>
+
+<span class="sd">&gt;&gt;&gt; isinstance(CLINICAL_SCALES, SalaryScaleTable)</span>
+<span class="sd">True</span>
+
 <span class="sd">Using the table, one can find, as an example, the starting salary for grade 2 as of the 1st January</span>
 <span class="sd">2017:</span>
 
@@ -274,7 +280,16 @@
     <span class="n">GRADE_12_BAND_3</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
 
     <span class="c1">#: Grade 12 band 4</span>
-    <span class="n">GRADE_12_BAND_4</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
+    <span class="n">GRADE_12_BAND_4</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Clinical nodal points</span>
+    <span class="n">CLINICAL_NODAL</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Clinical consultant</span>
+    <span class="n">CLINICAL_CONSULTANT</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+
+    <span class="c1">#: Clinical research associate or lecturer</span>
+    <span class="n">CLINICAL_RA_AND_LECTURER</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="SalaryScaleTable"><a class="viewcode-back" href="../../../index.html#ucamstaffoncosts.SalaryScaleTable">[docs]</a><span class="k">class</span> <span class="nc">SalaryScaleTable</span><span class="p">:</span>
@@ -532,6 +547,9 @@
 
 <span class="n">SALARY_SCALES</span> <span class="o">=</span> <span class="n">SalaryScaleTable</span><span class="p">(</span>
     <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_string</span><span class="p">(</span><span class="s1">&#39;ucamstaffoncosts&#39;</span><span class="p">,</span> <span class="s1">&#39;data/salary_scales.yaml&#39;</span><span class="p">)))</span>
+
+<span class="n">CLINICAL_SCALES</span> <span class="o">=</span> <span class="n">SalaryScaleTable</span><span class="p">(</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_string</span><span class="p">(</span><span class="s1">&#39;ucamstaffoncosts&#39;</span><span class="p">,</span> <span class="s1">&#39;data/clinical_scales.yaml&#39;</span><span class="p">)))</span>
 </pre></div>
 
            </div>

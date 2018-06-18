@@ -726,6 +726,24 @@ explain why the employee’s salary is what it is during the tax year.</p>
 <dd><p>Grade 12 band 4</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Grade.CLINICAL_NODAL">
+<code class="descname">CLINICAL_NODAL</code><em class="property"> = 17</em><a class="headerlink" href="#ucamstaffoncosts.Grade.CLINICAL_NODAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clinical nodal points</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Grade.CLINICAL_CONSULTANT">
+<code class="descname">CLINICAL_CONSULTANT</code><em class="property"> = 18</em><a class="headerlink" href="#ucamstaffoncosts.Grade.CLINICAL_CONSULTANT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clinical consultant</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ucamstaffoncosts.Grade.CLINICAL_RA_AND_LECTURER">
+<code class="descname">CLINICAL_RA_AND_LECTURER</code><em class="property"> = 19</em><a class="headerlink" href="#ucamstaffoncosts.Grade.CLINICAL_RA_AND_LECTURER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clinical research associate or lecturer</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1646,6 +1664,12 @@ constant:</p>
 pre-initialised table using the most recent data available. For all calls which take a table
 parameter, this table is the default.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">SALARY_SCALES</span><span class="p">,</span> <span class="n">SalaryScaleTable</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>There are various clinical scales which are not represented in this table. For those, you would
+want to use the <code class="xref py py-data docutils literal notranslate"><span class="pre">CLINICAL_SCALES</span></code> constant</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">CLINICAL_SCALES</span><span class="p">,</span> <span class="n">SalaryScaleTable</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>
 </div>
