@@ -230,7 +230,16 @@ class SalaryScaleTable:
             ...
         ValueError: point "P5" is not part of grade "Grade.GRADE_1"
 
+        If the grade is ``None``, the "increment" will always return the input grade.
+
+        >>> EXAMPLE_SALARY_SCALES.increment(None, 'P5')
+        'P5'
+
         """
+        # If grade is Nonwe, just return point
+        if grade is None:
+            return point
+
         # Get salary scale for grade
         scale = self.scale_for_grade(grade)
 

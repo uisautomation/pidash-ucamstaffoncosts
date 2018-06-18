@@ -290,6 +290,20 @@ Running total commitment: 90245
 <BLANKLINE>
 <BLANKLINE>
 
+If *initial_grade* is ``None``, the mapping table will still be used but annual
+increments will not be processed which means that the total expenditure and
+commitments will be lower:
+
+>>> expenditure, commitments, explanations = ucamstaffoncosts.employment_expenditure_and_commitments(
+...     until_date, None, initial_point, scheme, start_date=start_date,
+...     from_date=from_date, next_anniversary_date=next_anniversary_date,
+...     scale_table=EXAMPLE_SALARY_SCALES)
+>>> expenditure
+14837
+>>> commitments
+87258
+
+
 Reference
 ---------
 
