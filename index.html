@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -245,202 +247,203 @@ explanations to explain the calculation:</p>
 <span class="gp">... </span>        <span class="n">running_commitment</span> <span class="o">+=</span> <span class="n">explanation</span><span class="o">.</span><span class="n">commitment</span>
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running total commitment: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">running_commitment</span><span class="p">))</span>
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">print_explanations</span><span class="p">(</span><span class="n">explanations</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">print_explanations</span><span class="p">(</span><span class="n">explanations</span><span class="p">)</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2015/2016</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason          | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+-----------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2015-04-01 | employee start  | Grade.GRADE_2 | P3    | 14254       | 2014-08-01</span>
 <span class="go">2015-04-06 | end of tax year | Grade.GRADE_2 | P3    | 14254       | 2014-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">195    | -16      | 51               | 0            | 0                   | 230   | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 195</span>
 <span class="go">Salary earned after 2016-02-01: 0</span>
 <span class="go">Expenditure until 2016-02-01: 230</span>
 <span class="go">Commitment from 2016-02-01: 0</span>
 <span class="go">Running total commitment: 0</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2015/2016</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2015-04-06 | start of tax year              | Grade.GRADE_2 | P3    | 14254       | 2014-08-01</span>
 <span class="go">2015-08-01 | new salary table (approximate) | Grade.GRADE_2 | P3    | 14539       | 2015-08-01</span>
 <span class="go">2016-04-06 | end of tax year                | Grade.GRADE_2 | P3    | 14539       | 2015-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">14448  | -1156    | 3756             | 672          | 66                  | 17786 | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 14448</span>
 <span class="go">Salary earned after 2016-02-01: 2582</span>
 <span class="go">Expenditure until 2016-02-01: 14607</span>
 <span class="go">Commitment from 2016-02-01: 3179</span>
 <span class="go">Running total commitment: 3179</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2016/2017</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                      | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+-----------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2016-04-06 | start of tax year           | Grade.GRADE_2 | P3    | 14539       | 2015-08-01</span>
 <span class="go">2016-06-01 | anniversary: point P3 to P4 | Grade.GRADE_2 | P4    | 14818       | 2015-08-01</span>
 <span class="go">2016-08-01 | new salary table            | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
 <span class="go">2017-04-06 | end of tax year             | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 14934</span>
 <span class="go">Salary earned after 2016-02-01: 14934</span>
 <span class="go">Expenditure until 2016-02-01: 0</span>
 <span class="go">Commitment from 2016-02-01: 18423</span>
 <span class="go">Running total commitment: 21602</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2017/2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                      | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+-----------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2017-04-06 | start of tax year           | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
 <span class="go">2017-06-01 | anniversary: point P4 to P5 | Grade.GRADE_2 | P5    | 15356       | 2016-08-01</span>
 <span class="go">2017-08-01 | new salary table            | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
 <span class="go">2018-04-06 | end of tax year             | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 15557</span>
 <span class="go">Salary earned after 2016-02-01: 15557</span>
 <span class="go">Expenditure until 2016-02-01: 0</span>
 <span class="go">Commitment from 2016-02-01: 19241</span>
 <span class="go">Running total commitment: 40843</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2018/2019</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2018-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
 <span class="go">2018-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
 <span class="go">2019-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 15934</span>
 <span class="go">Salary earned after 2016-02-01: 15934</span>
 <span class="go">Expenditure until 2016-02-01: 0</span>
 <span class="go">Commitment from 2016-02-01: 19735</span>
 <span class="go">Running total commitment: 60578</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2019/2020</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2019-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
 <span class="go">2019-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
 <span class="go">2020-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 16253</span>
 <span class="go">Salary earned after 2016-02-01: 16253</span>
 <span class="go">Expenditure until 2016-02-01: 0</span>
 <span class="go">Commitment from 2016-02-01: 20154</span>
 <span class="go">Running total commitment: 80732</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2020/2021</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2020-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
 <span class="go">2020-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16683       | 2020-08-01</span>
 <span class="go">2020-10-01 | end of employment              | Grade.GRADE_2 | P5    | 16683       | 2020-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salary for year: 8031</span>
 <span class="go">Salary earned after 2016-02-01: 8031</span>
 <span class="go">Expenditure until 2016-02-01: 0</span>
 <span class="go">Commitment from 2016-02-01: 9513</span>
 <span class="go">Running total commitment: 90245</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 </pre></div>
 </div>
 <p>If <em>initial_grade</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the mapping table will still be used but annual
@@ -864,7 +867,7 @@ employ a staff member. The functionality of the module is exposed through a sing
 returns an <a class="reference internal" href="#ucamstaffoncosts.Cost" title="ucamstaffoncosts.Cost"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cost</span></code></a> object representing the on-costs for that employee:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">calculate_cost</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">base_salary</span><span class="o">=</span><span class="mi">25000</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="n">Scheme</span><span class="o">.</span><span class="n">USS</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="mi">2018</span>
-<span class="gp">... </span><span class="p">)</span> 
+<span class="gp">... </span><span class="p">)</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
 <span class="go">Cost(salary=25000, exchange=0, employer_pension=4500,</span>
 <span class="go">     employer_nic=2287, apprenticeship_levy=125, total=31912, tax_year=...)</span>
 </pre></div>
@@ -911,117 +914,118 @@ non-employment of 1st October 2020:</p>
 <span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;(approximated using tax tables for </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cost</span><span class="o">.</span><span class="n">tax_year</span><span class="p">))</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="n">pprinttable</span><span class="p">([</span><span class="n">cost</span><span class="p">])</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> 
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2016/2017</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                      | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+-----------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2016-04-06 | start of tax year           | Grade.GRADE_2 | P3    | 14539       | 2015-08-01</span>
 <span class="go">2016-06-01 | anniversary: point P3 to P4 | Grade.GRADE_2 | P4    | 14818       | 2015-08-01</span>
 <span class="go">2016-08-01 | new salary table            | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
 <span class="go">2017-04-06 | end of tax year             | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2017/2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                      | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+-----------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2017-04-06 | start of tax year           | Grade.GRADE_2 | P4    | 15052       | 2016-08-01</span>
 <span class="go">2017-06-01 | anniversary: point P4 to P5 | Grade.GRADE_2 | P5    | 15356       | 2016-08-01</span>
 <span class="go">2017-08-01 | new salary table            | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
 <span class="go">2018-04-06 | end of tax year             | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2018/2019</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2018-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 15721       | 2017-08-01</span>
 <span class="go">2018-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
 <span class="go">2019-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2019/2020</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2019-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16035       | 2018-08-01</span>
 <span class="go">2019-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
 <span class="go">2020-04-06 | end of tax year                | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">============================================================</span>
 <span class="go">TAX YEAR: 2020/2021</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Salaries</span>
 <span class="go">--------</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">date       | reason                         | grade         | point | base_salary | mapping_table_date</span>
 <span class="go">-----------+--------------------------------+---------------+-------+-------------+-------------------</span>
 <span class="go">2020-04-06 | start of tax year              | Grade.GRADE_2 | P5    | 16356       | 2019-08-01</span>
 <span class="go">2020-08-01 | new salary table (approximate) | Grade.GRADE_2 | P5    | 16683       | 2020-08-01</span>
 <span class="go">2020-10-01 | end of employment              | Grade.GRADE_2 | P5    | 16683       | 2020-08-01</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">Costs</span>
 <span class="go">-----</span>
 <span class="go">(approximated using tax tables for 2018)</span>
-
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 <span class="go">salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year</span>
 <span class="go">-------+----------+------------------+--------------+---------------------+-------+---------</span>
 <span class="go">8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018</span>
-
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
 </pre></div>
 </div>
 <dl class="data">
@@ -1092,12 +1096,12 @@ employed since before the start of the tax year</li>
 <p>Each row returns the tax year, cost and salary record:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">2016</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">Cost(salary=14934, exchange=-1195, employer_pension=3883, employer_nic=733,</span>
 <span class="go">     apprenticeship_levy=68, total=18423, tax_year=2018)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
 <span class="go">4</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">costs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">SalaryRecord(date=datetime.date(2016, 4, 6), reason=&#39;start of tax year&#39;,</span>
 <span class="go">             grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;P3&#39;, base_salary=14539,</span>
 <span class="go">             mapping_table_date=datetime.date(2015, 8, 1))</span>
@@ -1209,7 +1213,7 @@ default to <cite>None</cite>:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Salary</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_2</span><span class="p">,</span> <span class="s1">&#39;POINT_X&#39;</span><span class="p">)</span>
 <span class="go">Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=None, as_of_date=None)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Salary</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_2</span><span class="p">,</span> <span class="s1">&#39;POINT_X&#39;</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span>
-<span class="gp">... </span>       <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> 
+<span class="gp">... </span>       <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=10000,</span>
 <span class="go">       as_of_date=datetime.date(2017, 8, 1))</span>
 </pre></div>
@@ -1251,7 +1255,7 @@ modified.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span>
 <span class="go">Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=None, as_of_date=None)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">with_base</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s2</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">Salary(grade=&lt;Grade.GRADE_2: 3&gt;, point=&#39;POINT_X&#39;, base_per_annum=10000,</span>
 <span class="go">       as_of_date=datetime.date(2017, 8, 1))</span>
 </pre></div>
@@ -1307,7 +1311,7 @@ reason for the change.</p>
 <p>If <em>elide_null_changes</em> is False, changes which do not change the salary are still reported:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fmt_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{date!s: &lt;12}</span><span class="s1"> | </span><span class="si">{reason: &lt;20}</span><span class="s1"> | </span><span class="si">{grade!s: &lt;16}</span><span class="s1"> | </span><span class="si">{point!s: &lt;5}</span><span class="s1">&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">fold</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">elide_null_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> 
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">2017-01-01   | pass through salary  | None             | None</span>
 <span class="go">2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
 <span class="go">2017-02-01   | null change          | Grade.GRADE_1    | P1</span>
@@ -1318,7 +1322,7 @@ reason for the change.</p>
 <p>The default is for <em>elide_null_changes</em> to be <code class="docutils literal notranslate"><span class="pre">True</span></code> which means that changes which do not
 change the salary are swallowed:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">fold</span><span class="p">(</span><span class="n">changes</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> 
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
 <span class="go">2017-03-01   | point -&gt; P2          | Grade.GRADE_1    | P2</span>
 <span class="go">2017-04-01   | grade -&gt; G2          | Grade.GRADE_2    | P2</span>
@@ -1328,7 +1332,7 @@ change the salary are swallowed:</p>
 <em>initial_salary</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">initial_salary</span> <span class="o">=</span> <span class="n">Salary</span><span class="p">(</span><span class="n">grade</span><span class="o">=</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_2</span><span class="p">,</span> <span class="n">point</span><span class="o">=</span><span class="s1">&#39;P5&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">fold</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="n">initial_salary</span><span class="o">=</span><span class="n">initial_salary</span><span class="p">,</span> <span class="n">elide_null_changes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> 
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">row</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()))</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">2017-01-01   | pass through salary  | Grade.GRADE_2    | P5</span>
 <span class="go">2017-01-01   | set grade and point  | Grade.GRADE_1    | P1</span>
 <span class="go">2017-02-01   | null change          | Grade.GRADE_1    | P1</span>
@@ -1459,7 +1463,7 @@ on the anniversary of employment starting from <em>next_anniversary_date</em>.</
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ucamstaffoncosts.salary.scales</span> <span class="k">import</span> <span class="n">EXAMPLE_SALARY_SCALES</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grade</span> <span class="o">=</span> <span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">point</span> <span class="o">=</span> <span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">starting_point_for_grade</span><span class="p">(</span><span class="n">grade</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">set_salary</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">))</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">next</span><span class="p">(</span><span class="n">set_salary</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">grade</span><span class="p">,</span> <span class="n">point</span><span class="p">))</span> <span class="c1"># doctest: +ELLIPSIS</span>
 <span class="go">SalaryChange(date=datetime.date(2017, 1, 1), update_salary=...)</span>
 </pre></div>
 </div>
@@ -1498,7 +1502,7 @@ monotonically increasing deadline. The implementation does not attempt to enforc
 <span class="gp">... </span>    <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;it1_3&#39;</span><span class="p">)</span>
 <span class="gp">... </span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">merge_priority_iterables</span><span class="p">([</span><span class="n">it0</span><span class="p">,</span> <span class="n">it1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">[(datetime.date(2018, 1, 1), 1, &#39;it1_0&#39;), (datetime.date(2018, 3, 31), 0, &#39;it0_0&#39;),</span>
 <span class="go">(datetime.date(2018, 3, 31), 1, &#39;it1_1&#39;), (datetime.date(2018, 4, 5), 0, &#39;it0_1&#39;),</span>
 <span class="go">(datetime.date(2018, 4, 7), 1, &#39;it1_2&#39;), (datetime.date(2018, 6, 1), 0, &#39;it0_2&#39;),</span>
@@ -1513,7 +1517,7 @@ monotonically increasing deadline. The implementation does not attempt to enforc
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">merge_priority_iterables</span><span class="p">([</span><span class="n">it0</span><span class="p">,</span> <span class="n">it1</span><span class="p">,</span> <span class="n">it3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">q</span><span class="p">))</span>  
+<span class="gp">... </span>    <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2018</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">q</span><span class="p">))</span>  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">[(datetime.date(2018, 1, 1), 1, &#39;it1_0&#39;), (datetime.date(2018, 1, 1), 2, &#39;it3_0&#39;),</span>
 <span class="go">(datetime.date(2018, 1, 31), 2, &#39;it3_1&#39;), (datetime.date(2018, 3, 2), 2, &#39;it3_2&#39;),</span>
 <span class="go">(datetime.date(2018, 3, 31), 0, &#39;it0_0&#39;), (datetime.date(2018, 3, 31), 1, &#39;it1_1&#39;),</span>
@@ -1730,7 +1734,7 @@ is now at the top non-contribution points for the grade. Hence, the salary will 
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) – a data table whose format is epitomised by the <a class="reference download internal" href="_downloads/example_salary_scales.yaml" download=""><code class="xref download docutils literal notranslate"><span class="pre">example</span></code></a> used in this documentation.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>dict</em>) – a data table whose format is epitomised by the <a class="reference download internal" download="" href="_downloads/f8ea93b7d5a3535cb409ba5cd0dc6929/example_salary_scales.yaml"><code class="xref download docutils literal notranslate"><span class="pre">example</span></code></a> used in this documentation.</td>
 </tr>
 </tbody>
 </table>
@@ -1781,7 +1785,7 @@ is the <em>spine point</em>, name as used by the table returned by
 </tbody>
 </table>
 <p>Let’s look at the scale for grade 1:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_1</span><span class="p">)</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_1</span><span class="p">)</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">[ScaleRow(name=&#39;X1&#39;, point=&#39;P1&#39;, is_contribution=False),</span>
 <span class="go">ScaleRow(name=&#39;X2&#39;, point=&#39;P2&#39;, is_contribution=False),</span>
 <span class="go">ScaleRow(name=&#39;X3&#39;, point=&#39;P3&#39;, is_contribution=False),</span>
@@ -1832,7 +1836,7 @@ increments.</p>
 </tr>
 </tbody>
 </table>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_1</span><span class="p">)</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="n">Grade</span><span class="o">.</span><span class="n">GRADE_1</span><span class="p">)</span> <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
 <span class="go">[ScaleRow(name=&#39;X1&#39;, point=&#39;P1&#39;, is_contribution=False),</span>
 <span class="go">ScaleRow(name=&#39;X2&#39;, point=&#39;P2&#39;, is_contribution=False),</span>
 <span class="go">ScaleRow(name=&#39;X3&#39;, point=&#39;P3&#39;, is_contribution=False),</span>
@@ -1840,7 +1844,7 @@ increments.</p>
 </pre></div>
 </div>
 <p>Note that the grade <em>must</em> be a <a class="reference internal" href="#ucamstaffoncosts.Grade" title="ucamstaffoncosts.Grade"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grade</span></code></a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="s1">&#39;GRADE_1&#39;</span><span class="p">)</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EXAMPLE_SALARY_SCALES</span><span class="o">.</span><span class="n">scale_for_grade</span><span class="p">(</span><span class="s1">&#39;GRADE_1&#39;</span><span class="p">)</span> <span class="c1"># doctest: +ELLIPSIS</span>
 <span class="gt">Traceback (most recent call last):</span>
     <span class="o">...</span>
 <span class="gr">KeyError</span>: <span class="n">...</span>
@@ -1950,7 +1954,7 @@ table) pair giving the table and the date from which it became effective.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, UIS Automation Team.
+        &copy; Copyright 2018, UIS Automation Team
 
     </p>
   </div>
@@ -1967,32 +1971,16 @@ table) pair giving the table and the date from which it became effective.</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
