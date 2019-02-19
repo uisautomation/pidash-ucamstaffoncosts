@@ -48,6 +48,12 @@ TABLE_A_EMPLOYER_NIC = {
         (46350, fractions.Fraction(138, 1000)),
         (None, fractions.Fraction(138, 1000)),
     )),
+    2019: _make_nic_calculator((
+        (6136, 0),
+        (8632, 0),
+        (50000, fractions.Fraction(138, 1000)),
+        (None, fractions.Fraction(138, 1000)),
+    )),
 }
 
 
