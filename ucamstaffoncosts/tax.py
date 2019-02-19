@@ -41,11 +41,18 @@ def _make_nic_calculator(boundaries):
 
 
 #: Table A employer NICs keyed by tax year.
+#: https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2018-to-2019#paye-tax-and-class-1-national-insurance-contributions # noqa: E501
 TABLE_A_EMPLOYER_NIC = {
     2018: _make_nic_calculator((
         (6032, 0),
         (8424, 0),
         (46350, fractions.Fraction(138, 1000)),
+        (None, fractions.Fraction(138, 1000)),
+    )),
+    2019: _make_nic_calculator((
+        (6136, 0),
+        (8632, 0),
+        (50000, fractions.Fraction(138, 1000)),
         (None, fractions.Fraction(138, 1000)),
     )),
 }
