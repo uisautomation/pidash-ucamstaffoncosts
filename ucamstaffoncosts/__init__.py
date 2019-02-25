@@ -55,7 +55,7 @@ def employment_expenditure_and_commitments(until_date, initial_grade, initial_po
     >>> expenditure
     0
     >>> commitments
-    50146
+    50060
 
     The *occupancy* parameter allows one to specify what proportion of full time this person works:
 

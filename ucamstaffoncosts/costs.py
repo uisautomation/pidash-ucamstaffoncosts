@@ -78,12 +78,12 @@ date       | reason                      | grade         | point | base_salary |
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018
+14934  | -1195    | 3883             | 705          | 68                  | 18395 | 2019
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -101,12 +101,12 @@ date       | reason                      | grade         | point | base_salary |
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018
+15557  | -1245    | 4045             | 784          | 71                  | 19212 | 2019
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -144,12 +144,11 @@ date       | reason                         | grade         | point | base_salar
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018
+16253  | -1300    | 4226             | 872          | 74                  | 20125 | 2019
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -166,12 +165,12 @@ date       | reason                         | grade         | point | base_salar
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018
+8031   | -642     | 2088             | 0            | 36                  | 9513  | 2019
 <BLANKLINE>
 <BLANKLINE>
 
@@ -331,8 +330,8 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
     >>> costs[0][0]
     2016
     >>> costs[0][1] # doctest: +NORMALIZE_WHITESPACE
-    Cost(salary=14934, exchange=-1195, employer_pension=3883, employer_nic=733,
-         apprenticeship_levy=68, total=18423, tax_year=2018)
+    Cost(salary=14934, exchange=-1195, employer_pension=3883, employer_nic=705,
+         apprenticeship_levy=68, total=18395, tax_year=2019)
     >>> len(costs[0][2])
     4
     >>> costs[0][2][0] # doctest: +NORMALIZE_WHITESPACE
@@ -573,6 +572,72 @@ _ON_COST_CALCULATORS = {
             employer_pension_cb=pension.cps_pre_2013_employer_contribution,
             exchange_cb=pension.cps_pre_2013_employee_contribution,
             employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
+        ),
+    },
+    2019: {
+        # An employee with no scheme in tax year 2019/19
+        Scheme.NONE: _cost_calculator(
+            tax_year=2019,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with USS in tax year 2019/19
+        Scheme.USS: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.uss_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with USS and salary exchange in tax year 2019/19
+        Scheme.USS_EXCHANGE: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.uss_employer_contribution,
+            exchange_cb=pension.uss_employee_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with CPS in tax year 2019/19
+        Scheme.CPS_HYBRID: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.cps_hybrid_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with CPS and salary exchange in tax year 2019/19
+        Scheme.CPS_HYBRID_EXCHANGE: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.cps_hybrid_employer_contribution,
+            exchange_cb=pension.cps_hybrid_employee_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee on the NHS scheme in tax year 2019/19
+        Scheme.NHS: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.nhs_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee on the MRC scheme in tax year 2019/19
+        Scheme.MRC: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.mrc_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with CPS (pre-2013) in tax year 2019/19
+        Scheme.CPS_PRE_2013: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
+        ),
+
+        # An employee with CPS (pre-2013) and salary exchange in tax year 2019/19
+        Scheme.CPS_PRE_2013_EXCHANGE: _cost_calculator(
+            tax_year=2019,
+            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
+            exchange_cb=pension.cps_pre_2013_employee_contribution,
+            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
         ),
     },
 }

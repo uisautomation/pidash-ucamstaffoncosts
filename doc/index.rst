@@ -65,9 +65,9 @@ calculate the total commitment for employing this staff member as of
 ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
 ...     scale_table=EXAMPLE_SALARY_SCALES)
 >>> expenditure
-14837
+14814
 >>> commitments
-90245
+90153
 
 This number seems a little arbitrary so we can use the provided list of
 explanations to explain the calculation:
@@ -106,12 +106,12 @@ date       | reason          | grade         | point | base_salary | mapping_tab
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-195    | -16      | 51               | 0            | 0                   | 230   | 2018    
+195    | -16      | 51               | 0            | 0                   | 230   | 2019    
 <BLANKLINE>
 Salary for year: 195
 Salary earned after 2016-02-01: 0
@@ -134,18 +134,18 @@ date       | reason                         | grade         | point | base_salar
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-14448  | -1156    | 3756             | 672          | 66                  | 17786 | 2018    
+14448  | -1156    | 3756             | 643          | 66                  | 17757 | 2019    
 <BLANKLINE>
 Salary for year: 14448
 Salary earned after 2016-02-01: 2582
-Expenditure until 2016-02-01: 14607
-Commitment from 2016-02-01: 3179
-Running total commitment: 3179
+Expenditure until 2016-02-01: 14584
+Commitment from 2016-02-01: 3173
+Running total commitment: 3173
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -163,18 +163,18 @@ date       | reason                      | grade         | point | base_salary |
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-14934  | -1195    | 3883             | 733          | 68                  | 18423 | 2018    
+14934  | -1195    | 3883             | 705          | 68                  | 18395 | 2019    
 <BLANKLINE>
 Salary for year: 14934
 Salary earned after 2016-02-01: 14934
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 18423
-Running total commitment: 21602
+Commitment from 2016-02-01: 18395
+Running total commitment: 21568
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -192,18 +192,18 @@ date       | reason                      | grade         | point | base_salary |
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15557  | -1245    | 4045             | 813          | 71                  | 19241 | 2018    
+15557  | -1245    | 4045             | 784          | 71                  | 19212 | 2019    
 <BLANKLINE>
 Salary for year: 15557
 Salary earned after 2016-02-01: 15557
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 19241
-Running total commitment: 40843
+Commitment from 2016-02-01: 19212
+Running total commitment: 40780
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -230,7 +230,7 @@ Salary for year: 15934
 Salary earned after 2016-02-01: 15934
 Expenditure until 2016-02-01: 0
 Commitment from 2016-02-01: 19735
-Running total commitment: 60578
+Running total commitment: 60515
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -247,18 +247,17 @@ date       | reason                         | grade         | point | base_salar
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-16253  | -1300    | 4226             | 901          | 74                  | 20154 | 2018    
+16253  | -1300    | 4226             | 872          | 74                  | 20125 | 2019    
 <BLANKLINE>
 Salary for year: 16253
 Salary earned after 2016-02-01: 16253
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 20154
-Running total commitment: 80732
+Commitment from 2016-02-01: 20125
+Running total commitment: 80640
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -275,18 +274,18 @@ date       | reason                         | grade         | point | base_salar
 <BLANKLINE>
 Costs
 -----
-(approximated using tax tables for 2018)
+(approximated using tax tables for 2019)
 <BLANKLINE>
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-8031   | -642     | 2088             | 0            | 36                  | 9513  | 2018    
+8031   | -642     | 2088             | 0            | 36                  | 9513  | 2019    
 <BLANKLINE>
 Salary for year: 8031
 Salary earned after 2016-02-01: 8031
 Expenditure until 2016-02-01: 0
 Commitment from 2016-02-01: 9513
-Running total commitment: 90245
+Running total commitment: 90153
 <BLANKLINE>
 <BLANKLINE>
 
@@ -299,9 +298,9 @@ commitments will be lower:
 ...     from_date=from_date, next_anniversary_date=next_anniversary_date,
 ...     scale_table=EXAMPLE_SALARY_SCALES)
 >>> expenditure
-14837
+14814
 >>> commitments
-87258
+87166
 
 
 Reference
