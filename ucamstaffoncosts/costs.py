@@ -178,49 +178,18 @@ salary | exchange | employer_pension | employer_nic | apprenticeship_levy | tota
 """  # noqa: E501
 import collections
 import datetime
-import enum
 import fractions
 import itertools
 import math
 
 from . import tax
-from . import pension
 from .salary import progression
+from .pension import scheme_rates, is_exchange
 
-
-@enum.unique
-class Scheme(enum.Enum):
-    """
-    Possible pension schemes an employee can be a member of.
-
-    """
-
-    #: No pension scheme.
-    NONE = enum.auto()
-
-    #: CPS hybrid
-    CPS_HYBRID = enum.auto()
-
-    #: CPS hybrid with salary exchange
-    CPS_HYBRID_EXCHANGE = enum.auto()
-
-    #: USS
-    USS = enum.auto()
-
-    #: USS with salary exchange
-    USS_EXCHANGE = enum.auto()
-
-    #: NHS
-    NHS = enum.auto()
-
-    #: MRC
-    MRC = enum.auto()
-
-    #: CPS pre-2013
-    CPS_PRE_2013 = enum.auto()
-
-    #: CPS pre-2013 with salary exchange
-    CPS_PRE_2013_EXCHANGE = enum.auto()
+# Import Scheme from pension into module as part of the API even though it is not actually used by
+# any code in this module. (Scheme was formerly defined in this module and external code may depend
+# on this.)
+from .pension import Scheme  # noqa: F401
 
 
 _Cost = collections.namedtuple(
@@ -275,26 +244,83 @@ class Cost(_Cost):
 LATEST = 'LATEST'
 
 
-def calculate_cost(base_salary, scheme, year=LATEST):
+def calculate_cost(
+        base_salary, scheme, year=LATEST,
+        employee_pension_contribution=None, employer_pension_contribution=None):
     """
     Return a :py:class:`Cost` instance given a tax year, pension scheme and base salary.
 
     :param int year: tax year
-    :param Scheme scheme: pension scheme
+    :param Scheme scheme: pension scheme.
     :param int base_salary: base salary of employee
+    :param employee_pension_contribution: total employee pension contributions for the year
+    :param employer_pension_contribution: total employer pension contributions for the year
 
     :raises NotImplementedError: if there is not an implementation for the specified tax year and
         pension scheme.
+
+    If either pension contribution values are None, employee/employer pension contributions are
+    approximated using the rate for the beginning of the *calendar* year rather than taking the
+    values from employee_pension_contribution and employer_pension_contribution
 
     """
     year = _LATEST_TAX_YEAR if year is LATEST else year
 
     try:
-        calculator = _ON_COST_CALCULATORS[year][scheme]
+        nic_table = tax.TABLE_A_EMPLOYER_NIC[year]
     except KeyError:
         raise NotImplementedError()
 
-    return calculator(base_salary)
+    # Get the pension rate at the start of the calendar year. Only used if the contritions passed
+    # are None.
+    pension_approximate_rate = next(
+        scheme_rates(scheme, datetime.date(year=year, month=1, day=1)))[1]
+    if employee_pension_contribution is None:
+        employee_pension_contribution = pension_approximate_rate.employee * base_salary
+    if employer_pension_contribution is None:
+        employer_pension_contribution = pension_approximate_rate.employer * base_salary
+
+    # We use the convention that the salary exchange value is negative to match the exchange
+    # column in HR tables.
+    exchange = -employee_pension_contribution if is_exchange(scheme) else 0
+
+    # The employer pension contribution is the contribution based on base salary along with
+    # the employee contribution sacrificed from their salary.
+    employer_pension = employer_pension_contribution - exchange
+
+    # the taxable salary is the base less the amount sacrificed. HR would appear to round the
+    # sacrifice first
+    taxable_salary = base_salary + _excel_round(exchange)
+
+    # The employer's NIC is calculated on the taxable salary.
+    employer_nic = nic_table(taxable_salary)
+
+    # The Apprenticeship Levy is calculated on the taxable salary.
+    apprenticeship_levy = tax.standard_apprenticeship_levy(taxable_salary)
+
+    # The total is calculated using the rounded values.
+    total = (
+        _excel_round(base_salary)
+        + _excel_round(exchange)
+        + _excel_round(employer_pension)
+        + _excel_round(employer_nic)
+        + _excel_round(apprenticeship_levy)
+    )
+
+    # Round all of the values. Note the odd rounding for exchange. This matters since the
+    # tables HR generate seem to include -_excel_round(-exchange) even though the total column
+    # is calculated using _excel_round(exchange). Since Excel always rounds halves up, this
+    # means that _excel_round(exchange) does not, in general, equal -_excel_round(-exchange) as
+    # you might expect. Caveat programmer!
+    return Cost(
+        salary=_excel_round(base_salary),
+        exchange=-_excel_round(-exchange),
+        employer_pension=_excel_round(employer_pension),
+        employer_nic=_excel_round(employer_nic),
+        apprenticeship_levy=_excel_round(apprenticeship_levy),
+        total=_excel_round(total),
+        tax_year=year,
+    )
 
 
 def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
@@ -400,93 +426,79 @@ def costs_by_tax_year(from_year, initial_grade, initial_point, scheme,
             mapping_table_date=end_salary.mapping_table_date
         ))
 
+        # For each salary period, we compute the total employee and employer contributions to the
+        # pension for that period and sum them over the tax year.
+        employer_pension_contribution = fractions.Fraction(0, 1)
+        employee_pension_contribution = fractions.Fraction(0, 1)
+
         # Sum up per-day salaries
         total_salary = fractions.Fraction(0, 1)
         for start, end in zip(salaries, salaries[1:]):
+            # Although the base salary remains constant during this period, the pension rate may
+            # change. We model this as assuming a salary period of 100 days with a rate change on
+            # the 10th day results in a pension contribution of 0.1 * the contribution with the
+            # first rate and then 0.9 * the pension contribution with the second. We have to do
+            # this dance for each salary period because someone whose salary is lower in the first
+            # half of the year and higher in the second and where there is a pension rate change
+            # halfway through the year will pay pension contributions on one rate at their lower
+            # salary and another rate at their higher salary.
+
+            # We firstly obtain a list of all the pension rate changes and their dates for the
+            # period in question. This is a list of (date, Rate) pairs.
+            pension_rates = list(itertools.takewhile(
+                lambda entry: entry[0] < end.date,
+                scheme_rates(scheme, start.date)
+            ))
+
+            # Convert pension rate dates into time deltas for that rate. So, for example, a period
+            # with two pension rates in it yields a list of two timedeltas giving the effective
+            # length of the first rate and then the second.
+            pension_rate_duration_days = []
+            pension_rate_start_dates = [rate_start for rate_start, _ in pension_rates]
+            for pension_rate_start, pension_rate_end in zip(
+                    pension_rate_start_dates, pension_rate_start_dates[1:] + [end.date]):
+                pension_rate_duration_days.append((pension_rate_end - pension_rate_start).days)
+
             # how many days in this range?
             days = (end.date - start.date).days
-            total_salary += fractions.Fraction(days * start.base_salary, tax_year_days)
 
-        # Compute total salary earned this year taking into account occupancy
-        total_salary = round(total_salary * occupancy_fraction)
+            # Check that the pension rate dates cover this period exactly.
+            assert sum(pension_rate_duration_days) == days, \
+                f'Sum of {pension_rate_duration_days!r} != {days}'
 
-        # Attempt to use this tax year for on-cost calculation, falling back to LATEST
+            # We update the employee and employer contributions by computing a weighted sum over
+            # the days of the base salary multiplied by the occupancy fraction.
+            for (_, pension_rate), pension_rate_duration_days in zip(
+                    pension_rates, pension_rate_duration_days):
+                # How much salary is earned in this pension period?
+                earned_salary = fractions.Fraction(
+                    occupancy_fraction * pension_rate_duration_days * start.base_salary,
+                    tax_year_days)
+
+                employer_pension_contribution += earned_salary * pension_rate.employer
+                employee_pension_contribution += earned_salary * pension_rate.employee
+
+            # Calculate the contribution to the total salary from this salary period.
+            total_salary += fractions.Fraction(
+                occupancy_fraction * days * start.base_salary, tax_year_days)
+
+        # Round the total salary earned since, apparently, this is what the HR tables do.
+        total_salary = _excel_round(total_salary)
+
+        # Calculate the full on costs by using the NIC tables for the tax year in question falling
+        # back to the latest tables if we don't have NIC tables yet.
         try:
-            calculated_cost = calculate_cost(total_salary, scheme, year)
+            calculated_cost = calculate_cost(
+                total_salary, scheme, year=year,
+                employee_pension_contribution=employee_pension_contribution,
+                employer_pension_contribution=employer_pension_contribution)
         except NotImplementedError:
-            calculated_cost = calculate_cost(total_salary, scheme, LATEST)
+            calculated_cost = calculate_cost(
+                total_salary, scheme, year=LATEST,
+                employee_pension_contribution=employee_pension_contribution,
+                employer_pension_contribution=employer_pension_contribution)
 
         yield year, calculated_cost, salaries
-
-
-def _cost_calculator(tax_year, employer_nic_cb,
-                     employer_pension_cb=lambda _: 0,
-                     exchange_cb=lambda _: 0,
-                     apprenticeship_levy_cb=tax.standard_apprenticeship_levy):
-    """
-    Return a callable which will calculate an Cost entry from a base salary. Arguments which are
-    callables each take a single argument which is a :py:class:`fractions.Fraction` instance
-    representing the base salary of the employee. They should return a
-    :py:class:`fractions.Fraction` instance.
-
-    :param employer_pension_cb: callable which gives employer pension contribution from base
-        salary.
-    :param employer_nic_cb: callable which gives employer National Insurance contribution from
-        base salary.
-    :param exchange_cb: callable which gives amount of salary sacrificed in a salary exchange
-        scheme from base salary.
-    :param apprenticeship_levy_cb: callable which calculates the Apprenticeship Levy from base
-        salary.
-
-    """
-    def _calculate(base_salary):
-        # Ensure base salary is a rational
-        base_salary = fractions.Fraction(base_salary)
-
-        # We use the convention that the salary exchange value is negative to match the exchange
-        # column in HR tables.
-        exchange = -exchange_cb(base_salary)
-
-        # The employer pension contribution is the contribution based on base salary along with
-        # the employee contribution sacrificed from their salary.
-        employer_pension = employer_pension_cb(base_salary) - exchange
-
-        # the taxable salary is the base less the amount sacrificed. HR would appear to round the
-        # sacrifice first
-        taxable_salary = base_salary + _excel_round(exchange)
-
-        # The employer's NIC is calculated on the taxable salary.
-        employer_nic = employer_nic_cb(taxable_salary)
-
-        # The Apprenticeship Levy is calculated on the taxable salary.
-        apprenticeship_levy = apprenticeship_levy_cb(taxable_salary)
-
-        # The total is calculated using the rounded values.
-        total = (
-            _excel_round(base_salary)
-            + _excel_round(exchange)
-            + _excel_round(employer_pension)
-            + _excel_round(employer_nic)
-            + _excel_round(apprenticeship_levy)
-        )
-
-        # Round all of the values. Note the odd rounding for exchange. This matters since the
-        # tables HR generate seem to include -_excel_round(-exchange) even though the total column
-        # is calculated using _excel_round(exchange). Since Excel always rounds halves up, this
-        # means that _excel_round(exchange) does not, in general, equal -_excel_round(-exchange) as
-        # you might expect. Caveat programmer!
-
-        return Cost(
-            salary=_excel_round(base_salary),
-            exchange=-_excel_round(-exchange),
-            employer_pension=_excel_round(employer_pension),
-            employer_nic=_excel_round(employer_nic),
-            apprenticeship_levy=_excel_round(apprenticeship_levy),
-            total=_excel_round(total),
-            tax_year=tax_year,
-        )
-
-    return _calculate
 
 
 def _excel_round(n):
@@ -506,140 +518,4 @@ def _excel_round(n):
     return round(n)
 
 
-#: On cost calculators keyed initially by year and then by scheme identifier.
-_ON_COST_CALCULATORS = {
-    2018: {
-        # An employee with no scheme in tax year 2018/19
-        Scheme.NONE: _cost_calculator(
-            tax_year=2018,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with USS in tax year 2018/19
-        Scheme.USS: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.uss_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with USS and salary exchange in tax year 2018/19
-        Scheme.USS_EXCHANGE: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.uss_employer_contribution,
-            exchange_cb=pension.uss_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS in tax year 2018/19
-        Scheme.CPS_HYBRID: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS and salary exchange in tax year 2018/19
-        Scheme.CPS_HYBRID_EXCHANGE: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            exchange_cb=pension.cps_hybrid_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee on the NHS scheme in tax year 2018/19
-        Scheme.NHS: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.nhs_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee on the MRC scheme in tax year 2018/19
-        Scheme.MRC: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.mrc_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS (pre-2013) in tax year 2018/19
-        Scheme.CPS_PRE_2013: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-
-        # An employee with CPS (pre-2013) and salary exchange in tax year 2018/19
-        Scheme.CPS_PRE_2013_EXCHANGE: _cost_calculator(
-            tax_year=2018,
-            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
-            exchange_cb=pension.cps_pre_2013_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2018],
-        ),
-    },
-    2019: {
-        # An employee with no scheme in tax year 2019/19
-        Scheme.NONE: _cost_calculator(
-            tax_year=2019,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with USS in tax year 2019/19
-        Scheme.USS: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.uss_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with USS and salary exchange in tax year 2019/19
-        Scheme.USS_EXCHANGE: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.uss_employer_contribution,
-            exchange_cb=pension.uss_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with CPS in tax year 2019/19
-        Scheme.CPS_HYBRID: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with CPS and salary exchange in tax year 2019/19
-        Scheme.CPS_HYBRID_EXCHANGE: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.cps_hybrid_employer_contribution,
-            exchange_cb=pension.cps_hybrid_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee on the NHS scheme in tax year 2019/19
-        Scheme.NHS: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.nhs_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee on the MRC scheme in tax year 2019/19
-        Scheme.MRC: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.mrc_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with CPS (pre-2013) in tax year 2019/19
-        Scheme.CPS_PRE_2013: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-
-        # An employee with CPS (pre-2013) and salary exchange in tax year 2019/19
-        Scheme.CPS_PRE_2013_EXCHANGE: _cost_calculator(
-            tax_year=2019,
-            employer_pension_cb=pension.cps_pre_2013_employer_contribution,
-            exchange_cb=pension.cps_pre_2013_employee_contribution,
-            employer_nic_cb=tax.TABLE_A_EMPLOYER_NIC[2019],
-        ),
-    },
-}
-
-_LATEST_TAX_YEAR = max(_ON_COST_CALCULATORS.keys())
+_LATEST_TAX_YEAR = max(tax.TABLE_A_EMPLOYER_NIC.keys())
