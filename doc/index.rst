@@ -67,7 +67,7 @@ calculate the total commitment for employing this staff member as of
 >>> expenditure
 14814
 >>> commitments
-90153
+91121
 
 This number seems a little arbitrary so we can use the provided list of
 explanations to explain the calculation:
@@ -224,13 +224,13 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018    
+15934  | -1277    | 4148             | 860          | 73                  | 19738 | 2018    
 <BLANKLINE>
 Salary for year: 15934
 Salary earned after 2016-02-01: 15934
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 19735
-Running total commitment: 60515
+Commitment from 2016-02-01: 19738
+Running total commitment: 60518
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -251,13 +251,13 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-16253  | -1300    | 4226             | 872          | 74                  | 20125 | 2019    
+16253  | -1567    | 4992             | 835          | 73                  | 20586 | 2019    
 <BLANKLINE>
 Salary for year: 16253
 Salary earned after 2016-02-01: 16253
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 20125
-Running total commitment: 80640
+Commitment from 2016-02-01: 20586
+Running total commitment: 81104
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -279,13 +279,13 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-8031   | -642     | 2088             | 0            | 36                  | 9513  | 2019    
+8031   | -916     | 2867             | 0            | 35                  | 10017 | 2019    
 <BLANKLINE>
 Salary for year: 8031
 Salary earned after 2016-02-01: 8031
 Expenditure until 2016-02-01: 0
-Commitment from 2016-02-01: 9513
-Running total commitment: 90153
+Commitment from 2016-02-01: 10017
+Running total commitment: 91121
 <BLANKLINE>
 <BLANKLINE>
 
@@ -300,7 +300,7 @@ commitments will be lower:
 >>> expenditure
 14814
 >>> commitments
-87166
+88101
 
 
 Reference

@@ -127,7 +127,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-15934  | -1275    | 4143             | 860          | 73                  | 19735 | 2018
+15934  | -1277    | 4148             | 860          | 73                  | 19738 | 2018
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -148,7 +148,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-16253  | -1300    | 4226             | 872          | 74                  | 20125 | 2019
+16253  | -1567    | 4992             | 835          | 73                  | 20586 | 2019
 <BLANKLINE>
 <BLANKLINE>
 ============================================================
@@ -170,7 +170,7 @@ Costs
 <BLANKLINE>
 salary | exchange | employer_pension | employer_nic | apprenticeship_levy | total | tax_year
 -------+----------+------------------+--------------+---------------------+-------+---------
-8031   | -642     | 2088             | 0            | 36                  | 9513  | 2019
+8031   | -916     | 2867             | 0            | 35                  | 10017 | 2019
 <BLANKLINE>
 <BLANKLINE>
 

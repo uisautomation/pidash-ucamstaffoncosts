@@ -1,4 +1,5 @@
 import collections
+import datetime
 import enum
 import fractions
 
@@ -78,6 +79,21 @@ def scheme_rates(scheme, from_date):
     >>> import datetime
     >>> list(scheme_rates(Scheme.NHS, datetime.date(year=2010, month=1, day=1)))
     [(datetime.date(2010, 1, 1), Rate(employer=Fraction(719, 5000), employee=0))]
+    >>> list(
+    ...     scheme_rates(Scheme.USS, datetime.date(year=2006, month=1, day=1))
+    ... ) # doctest: +NORMALIZE_WHITESPACE
+    [(datetime.date(2006, 1, 1), Rate(employer=Fraction(9, 50), employee=Fraction(2, 25))),
+    (datetime.date(2019, 4, 1), Rate(employer=Fraction(39, 200), employee=Fraction(11, 125))),
+    (datetime.date(2019, 10, 1), Rate(employer=Fraction(9, 40), employee=Fraction(13, 125))),
+    (datetime.date(2020, 4, 1), Rate(employer=Fraction(243, 1000), employee=Fraction(57, 500)))]
+    >>> list(
+    ...     scheme_rates(Scheme.USS_EXCHANGE, datetime.date(year=2019, month=4, day=1))
+    ... ) # doctest: +NORMALIZE_WHITESPACE
+    [(datetime.date(2019, 4, 1), Rate(employer=Fraction(39, 200), employee=Fraction(11, 125))),
+    (datetime.date(2019, 10, 1), Rate(employer=Fraction(9, 40), employee=Fraction(13, 125))),
+    (datetime.date(2020, 4, 1), Rate(employer=Fraction(243, 1000), employee=Fraction(57, 500)))]
+    >>> list(scheme_rates(Scheme.USS, datetime.date(year=2030, month=1, day=1)))
+    [(datetime.date(2030, 1, 1), Rate(employer=Fraction(243, 1000), employee=Fraction(57, 500)))]
 
     Salary exchange schemes are, from the point of view of rates, are equal to non-exchange
     schemes:
@@ -124,6 +140,18 @@ _SCHEME_TO_RATES = {
         (
             None,
             Rate(employer=fractions.Fraction(180, 1000), employee=fractions.Fraction(80, 1000))
+        ),
+        (
+            datetime.date(year=2019, month=4, day=1),
+            Rate(employer=fractions.Fraction(195, 1000), employee=fractions.Fraction(88, 1000))
+        ),
+        (
+            datetime.date(year=2019, month=10, day=1),
+            Rate(employer=fractions.Fraction(225, 1000), employee=fractions.Fraction(104, 1000))
+        ),
+        (
+            datetime.date(year=2020, month=4, day=1),
+            Rate(employer=fractions.Fraction(243, 1000), employee=fractions.Fraction(114, 1000))
         ),
     ],
 
