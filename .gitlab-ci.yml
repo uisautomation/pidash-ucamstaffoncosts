@@ -1,0 +1,5 @@
+include:
+  # Bring in the AutoDevOps template from GitLab.
+  # It can be viewed at:
+  # https://gitlab.com/gitlab-org/gitlab-ee/blob/master/lib/gitlab/ci/templates/Auto-DevOps.gitlab-ci.yml
+  - template: Auto-DevOps.gitlab-ci.yml
