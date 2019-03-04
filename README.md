@@ -1,5 +1,7 @@
 # University of Cambridge Salary On-cost Calculation
 
+> **This repository has been moved to https://gitlab.developers.cam.ac.uk/uis/devops/research-dashboard/ucamstaffoncosts/**
+
 [![CircleCI](https://circleci.com/gh/uisautomation/pidash-ucamstaffoncosts.svg?style=svg)](https://circleci.com/gh/uisautomation/pidash-ucamstaffoncosts)
 
 This repository contains a Python module which calculates total on-costs
